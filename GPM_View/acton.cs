@@ -22,9 +22,8 @@ namespace GPM_View
             this.act = account;
             this.api = api;
         }
-        public JObject getLst(string names)
+        public JObject getLst(string names , List<JObject> profiles)
         {
-            List<JObject> profiles = api.GetProfiles();
             if (profiles != null)
             {
                 foreach (JObject profile in profiles)
