@@ -328,7 +328,6 @@ namespace GPM_View
                         Thread.Sleep(TimeSpan.FromSeconds(5));
 
                         int rand = random.Next(80, 99);
-
                         int sleepTime = rand * timevideo / 100;
                         addStatus(index, "Chuyen video sau : " + sleepTime + " s");
                         driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(12);
@@ -407,21 +406,45 @@ namespace GPM_View
                         while (true)
                         {
                             videoNext += 1;
-                            if (videoNext == 3)
+                            int rand_video_next = random.Next(3, 8);
+                            if (videoNext == rand_video_next)
                             {
+                                
                                 if (sub.Checked)
                                 {
-                                    active.subVideo();
-                                    
-                                    
-                                    Thread.Sleep(5000);
+
+                                    try { active.subVideo(); }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+
+                                    Thread.Sleep(10000);
+
+                                    try { active.likeVideo(); }
+                                    catch
+                                    {
+                                        continue;
+                                    }
                                 }
                             }
-                            if (videoNext % 2 == 0)
+                            int rand_num_cmt = random.Next(2, 5);
+                            Thread.Sleep(10000);
+                            if (videoNext % rand_num_cmt == 0)
                             {
-                                active.likeVideo();
-                                // comment
-                                Thread.Sleep(6000);
+                                try
+                                {
+                                    int randomCommend = random.Next(listComments.Count);
+                                    var eleCommend = driver.FindElement(By.XPath("//yt-formatted-string[@class='style-scope ytd-comment-simplebox-renderer']"));
+                                    eleCommend.SendKeys(listComments[randomCommend]);
+                                    eleCommend.SendKeys(OpenQA.Selenium.Keys.Enter);
+                                    Thread.Sleep(6000);
+                                }
+                                catch
+                                {
+                                    continue;
+                                }
+                               
                             }
                             Thread.Sleep(5000);
 
@@ -745,6 +768,7 @@ namespace GPM_View
                         time.reset();
 
                         int rand = random.Next(80, 99);
+                 
                         for (int i = 0; i < iSoLanMoLink; i++)
                         {
 
@@ -765,12 +789,39 @@ namespace GPM_View
                             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(12);
                             Thread.Sleep(TimeSpan.FromSeconds(10));
 
-
-                            if (iSoLanMoLink % 2 == 0)
+                            int rand_num_cmt = random.Next(2, 5);
+                            if (iSoLanMoLink % rand_num_cmt == 0)
                             {
-                                active.subVideo();
-                            }
-                         
+                                if (sub.Checked)
+                                {
+                                    try { active.subVideo(); }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+
+                                    Thread.Sleep(10000);
+
+                                    try { active.likeVideo(); }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+
+                                }
+
+                                //cmt
+                                Thread.Sleep(10000);
+                            try {
+                                    int randomCommend = random.Next(listComments.Count);
+                                    var eleCommend = driver.FindElement(By.XPath("//yt-formatted-string[@class='style-scope ytd-comment-simplebox-renderer']"));
+                                    eleCommend.SendKeys(listComments[randomCommend]);
+                                    eleCommend.SendKeys(OpenQA.Selenium.Keys.Enter);
+                                }
+                                catch
+                                {
+                                    continue;
+                                }
                             if (sleepTime > 1 * 60)
                             {
                                 int sleepCount = sleepTime / (60);
@@ -1119,21 +1170,42 @@ namespace GPM_View
                         while (true)
                         {
                             videoNext += 1;
-                            if (videoNext == 3)
+                            int rand_video_next = random.Next(3, 8);
+                            if (videoNext == rand_video_next)
                             {
                                 if (sub.Checked)
                                 {
-                                    active.subVideo();
-                                    Thread.Sleep(5000);
+                                    try { active.subVideo(); }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+                                    Thread.Sleep(10000);
+
+                                    try { active.likeVideo(); }
+                                    catch
+                                    {
+                                        continue;
+                                    }
                                 }
                             }
-                            if (videoNext % 2 == 0)
-
+                            Thread.Sleep(10000);
+                            int rand_num_cmt = random.Next(2, 6);
+                            if (videoNext % rand_num_cmt == 0)
                             {
-                                Thread.Sleep(6000);
-                                active.likeVideo();
-                                // comment
-                                
+                                try
+                                {
+                                    int randomCommend = random.Next(listComments.Count);
+                                    var eleCommend = driver.FindElement(By.XPath("//yt-formatted-string[@class='style-scope ytd-comment-simplebox-renderer']"));
+                                    eleCommend.SendKeys(listComments[randomCommend]);
+                                    eleCommend.SendKeys(OpenQA.Selenium.Keys.Enter);
+                                    Thread.Sleep(6000);
+                                }
+                                catch
+                                {
+                                    continue;
+                                }
+                               
                             }
                             Thread.Sleep(5000);
 
