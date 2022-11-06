@@ -43,6 +43,7 @@ namespace GPM_View
         {
             int z_index = thread % 300;
             JObject startedResult = api.Start(createdProfileId);
+            Thread.Sleep(3000);
             if (startedResult != null)
             {
                 string browserLocation = Convert.ToString(startedResult["browser_location"]);

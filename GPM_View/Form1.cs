@@ -150,7 +150,6 @@ namespace GPM_View
                 addStatus(index, "starting");
                 GPMLoginAPI api = new GPMLoginAPI("http://" + APP_URL.Text);
                 acton sts = new acton(act, api);
-                addStatus(index, "đang mở profile");
                 Thread.Sleep(1000);
                 JObject ojb = sts.getLst(act.email, profiles);
                 string id_profile = "";
@@ -187,6 +186,7 @@ namespace GPM_View
                 try
                 {
                     Monitor.Enter(temp, ref lockWasTaken);
+                    addStatus(index, "đang mở profile");
                     try { driver = sts.openProfile(id_profile, index); }
                     catch
                     {
@@ -205,11 +205,19 @@ namespace GPM_View
                 while (dem_kb2 < nbThread.Value - 1)
                 {
                     dem_kb2++;
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
                 }
-                try { driver.Get(urlLogin); } catch { }
-                Thread.Sleep(2000);
                 addStatus(index, "truy cập google");
+                try { driver.Get(urlLogin); } catch {
+
+                    addStatus(index, "Lỗi truy cập google");
+                    driver.Close();
+                    driver.Dispose();
+                    driver.Quit();
+                    goto ketthuc;}
+
+                Thread.Sleep(2000);
+               
                 if (driver.Url.Contains("business.google.com/create/new"))
                 {
                     goto searchz;
@@ -311,12 +319,13 @@ namespace GPM_View
                             }
                             else
                             {
-                                string strResult = Regex.Replace(lines[0], @"[^a-zA-Z0-9]", string.Empty);
-                                if (strResult.Contains(strKeyWork) == false)
+                                string strResult = Regex.Replace(lines[0], @"[^a-zA-Z0-9]", string.Empty).Trim();
+
+                                if (strResult.ToLower().Contains(strKeyWork.ToLower()) == false)
                                 {
                                     continue;
                                 }
-                                if (lines[3].Contains(strTenChannel) == false)
+                                if (lines[3].Trim().ToLower().Contains(strTenChannel.ToLower()) == false)
                                 {
                                     continue;
                                 }
@@ -382,7 +391,7 @@ namespace GPM_View
                                 }
                                 else
                                 {
-                                    addStatus(index, "60s");
+                                    addStatus(index, "đang xem video mồi");
                                     driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1 * 60);
                                     Thread.Sleep(TimeSpan.FromMinutes(1));
                                     if ((j + 1) % 20 == 0)
@@ -431,9 +440,7 @@ namespace GPM_View
 
                         Thread.Sleep(10000);
                         int videoNext = 0;
-                    lopPLL:
-                        while (true)
-                        {
+                       for(int i = 0; i < 1000; i++) {
                             videoNext += 1;
                             int rand_video_next = random.Next(3, 8);
                             if (videoNext == rand_video_next)
@@ -490,7 +497,7 @@ namespace GPM_View
                             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(6);
                             Thread.Sleep(TimeSpan.FromSeconds(5));
 
-                            rand = random.Next(80, 99);
+                            rand = random.Next(80,99);
 
                             sleepTime = rand * timevideo / 100;
                             addStatus(index, "Chuyen video sau : " + sleepTime + " s");
@@ -517,7 +524,7 @@ namespace GPM_View
                                     }
                                     else
                                     {
-                                        addStatus(index, "60s");
+                                        addStatus(index, "Đang xem video PLL");
                                         driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1 * 60);
                                         Thread.Sleep(TimeSpan.FromMinutes(1));
                                         if ((j + 1) % 20 == 0)
@@ -543,6 +550,7 @@ namespace GPM_View
                             {
                                 tr = 1;
                             }
+                            addStatus(index, "Click Video Next");
                             if (tr == 0)
                             {
                                 try { driver.ExecuteScript("document.getElementsByClassName('ytp-prev-button ytp-button')[0].click()"); }
@@ -562,7 +570,14 @@ namespace GPM_View
                                 }
                             }
                             Thread.Sleep(10000);
-                            goto lopPLL;
+                            if(i == 999)
+                            {
+                                addStatus(index, "xem hết pll");
+                                driver.Close();
+                                driver.Dispose();
+                                driver.Quit();
+                                return;
+                            }
                         }
                         
                     }
@@ -579,7 +594,7 @@ namespace GPM_View
             }
             catch (Exception ex)
             {
-                addStatus(index, "timeout access google");
+                addStatus(index, ex.Message.ToString());
                 goto ketthuc;
             }
         ketthuc:
@@ -633,7 +648,6 @@ namespace GPM_View
                 addStatus(index, "starting");
                 GPMLoginAPI api = new GPMLoginAPI("http://" + APP_URL.Text);
                 acton sts = new acton(act, api);
-                addStatus(index, "đang mở profile");
                 Thread.Sleep(1000);
                 JObject ojb = sts.getLst(act.email, profiles);
                 string id_profile = "";
@@ -671,6 +685,7 @@ namespace GPM_View
                 try
                 {
                     Monitor.Enter(temp, ref lockWasTaken);
+                    addStatus(index, "đang mở profile");
                     try { driver = sts.openProfile(id_profile, index); }
                     catch
                     {
@@ -689,11 +704,20 @@ namespace GPM_View
                 while (dem_kb1 < nbThread.Value - 1)
                 {
                     dem_kb1++;
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
                 }
-                try { driver.Get(urlLogin); } catch { }
-
                 addStatus(index, "truy cập google");
+
+                try { driver.Get(urlLogin); } 
+                
+                catch {
+                    addStatus(index, "Lỗi truy cập google !");
+                    driver.Close();
+                    driver.Dispose();
+                    driver.Quit();
+                    goto ketthuc;
+                }
+
                 if (driver.Url.Contains("business.google.com/create/new"))
                 {
                     goto searchz;
@@ -795,13 +819,13 @@ namespace GPM_View
                             }
                             else
                             {
-                                string strResult = Regex.Replace(lines[0], @"[^a-zA-Z0-9]", string.Empty);
+                                string strResult = Regex.Replace(lines[0], @"[^a-zA-Z0-9]", string.Empty).Trim();
 
-                                if (strResult.Contains(strKeyWork) == false)
+                                if (strResult.ToLower().Contains(strKeyWork.ToLower()) == false)
                                 {
                                     continue;
                                 }
-                                if (lines[3].Contains(strTenChannel) == false)
+                                if (lines[3].Trim().ToLower().Contains(strTenChannel.ToLower()) == false)
                                 {
                                     continue;
                                 }
@@ -837,6 +861,7 @@ namespace GPM_View
 
                         for (int i = 0; i < iSoLanMoLink; i++)
                         {
+                            Thread.Sleep(TimeSpan.FromSeconds(30));
                             addStatus(index, "Reset video ve 0");
                             // Khởi tạo đối tượng thuộc Actions class
                             Actions action = new Actions(driver);
@@ -891,7 +916,11 @@ namespace GPM_View
                                     }
                                     else
                                     {
-                                        addStatus(index, "60s");
+                                        if(i > 0)
+                                        {
+                                            addStatus(index, "đang xem video lần click thứ" + i);
+                                        }
+                                        
                                         driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1 * 60);
                                         Thread.Sleep(TimeSpan.FromMinutes(1));
                                         if ((j + 1) % 20 == 0)
@@ -943,10 +972,13 @@ namespace GPM_View
                             }
                         }
                         addStatus(index, "Xong");
+                        driver.Close();
+                        driver.Dispose();
+                        driver.Quit();
                     }
                     catch (Exception ex) // catch 1
                     {
-                        addStatus(index, "timeout youtube google");
+                        addStatus(index, "timeout access youtube ");
                         driver.Close();
                         driver.Dispose();
                         driver.Quit();
@@ -955,7 +987,7 @@ namespace GPM_View
                 }
         }catch (Exception ex) // catch 1
             {
-                addStatus(index, "timeout access google");
+                addStatus(index, ex.Message.ToString());
                 goto ketthuc;
             }
         ketthuc:
@@ -985,7 +1017,7 @@ namespace GPM_View
                 addStatus(index, "starting");
                 GPMLoginAPI api = new GPMLoginAPI("http://" + APP_URL.Text);
                 acton sts = new acton(act, api);
-                addStatus(index, "đang mở profile");
+                
                 Thread.Sleep(1000);
                 JObject ojb = sts.getLst(act.email, profiles);
                 string id_profile = "";
@@ -1023,6 +1055,7 @@ namespace GPM_View
                 try
                 {
                     Monitor.Enter(temp, ref lockWasTaken);
+                    addStatus(index, "đang mở profile");
                     try { driver = sts.openProfile(id_profile, index); }
                     catch
                     {
@@ -1041,11 +1074,21 @@ namespace GPM_View
                 while (dem_kb3 < nbThread.Value - 1)
                 {
                     dem_kb3++;
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
                 }
-                try { driver.Get(urlLogin); } catch { }
-                Thread.Sleep(2000);
                 addStatus(index, "truy cập google");
+
+                try { driver.Get(urlLogin); } 
+
+                catch {
+                    addStatus(index, "Lỗi truy cập google !");
+                    driver.Close();
+                    driver.Dispose();
+                    driver.Quit();
+                    goto ketthuc;
+                }
+                Thread.Sleep(2000);
+                
                 if (driver.Url.Contains("business.google.com/create/new"))
                 {
                     goto searchz;
@@ -1147,12 +1190,13 @@ namespace GPM_View
                             }
                             else
                             {
-                                string strResult = Regex.Replace(lines[0], @"[^a-zA-Z0-9]", string.Empty);
-                                if (strResult.Contains(strKeyWork) == false)
+                                string strResult = Regex.Replace(lines[0], @"[^a-zA-Z0-9]", string.Empty).Trim();
+
+                                if (strResult.ToLower().Contains(strKeyWork.ToLower()) == false)
                                 {
                                     continue;
                                 }
-                                if (lines[3].Contains(strTenChannel) == false)
+                                if (lines[3].Trim().ToLower().Contains(strTenChannel.ToLower()) == false)
                                 {
                                     continue;
                                 }
@@ -1180,11 +1224,13 @@ namespace GPM_View
                             Thread.Sleep(1500);
                         }
                         addStatus(index, "Time Video " + timevideo);
-                        Thread.Sleep(3000);
+                       
                         time.reset();
+                        
+                        addStatus(index,"reset video time về 0");
 
-                        driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
-                        Thread.Sleep(TimeSpan.FromSeconds(5));
+                        driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+                        Thread.Sleep(TimeSpan.FromSeconds(30));
 
                         Actions action = new Actions(driver);
 
@@ -1247,8 +1293,8 @@ namespace GPM_View
                         Thread.Sleep(10000);
                         // xem pll 
                         int videoNext = 0;
-                        lopPLL:
-                        while (true)
+                       
+                        for(int i = 0; i < 1000; i++)
                         {
                             videoNext += 1;
                             int rand_video_next = random.Next(3, 8);
@@ -1372,8 +1418,15 @@ namespace GPM_View
                                     Thread.Sleep(1000);
                                 }
                             }
-                            Thread.Sleep(1000);
-                            goto lopPLL;
+                            Thread.Sleep(10000);
+                            if (i == 999)
+                            {
+                                addStatus(index, "xem hết pll");
+                                driver.Close();
+                                driver.Dispose();
+                                driver.Quit();
+                                return;
+                            }
                         }
                     }
 
@@ -1391,7 +1444,7 @@ namespace GPM_View
             }
             catch (Exception ex)
             {
-                addStatus(index, "error time out access google");
+                addStatus(index, ex.Message.ToString());
                 goto ketthuc;
             }
         ketthuc:
@@ -1467,7 +1520,7 @@ namespace GPM_View
         void clearchrome()
         {
 
-           Process[] chromeDriverProcesses = Process.GetProcessesByName("gpmdriver");
+           Process[] chromeDriverProcesses = Process.GetProcessesByName("gpmdriver.exe");
             foreach (var chromeDriverProcess in chromeDriverProcesses)
             {
                 try { chromeDriverProcess.Kill(); } catch { }
@@ -1477,6 +1530,8 @@ namespace GPM_View
             {
                 try { chrome.Kill(); } catch { }
             }
+
+            Process.Start("taskkill", "/F /IM gpmdriver.exe");
             
         }
         bool checkopentab = true;
@@ -1550,8 +1605,8 @@ namespace GPM_View
             }
             iSoLuong = (int)nbThread.Value;
             iIndexDangChay = 0;
-            strKeyWork = txtKeyword.Text;
-            strTenChannel = txtChannel.Text;
+            strKeyWork = txtKeyword.Text.Trim();
+            strTenChannel = txtChannel.Text.Trim();
             iSoLanMoLink = int.Parse(txtSoLanMoLink.Text);
             if (flag_view_dx == true)
             {   
@@ -1559,6 +1614,7 @@ namespace GPM_View
                 {
                     createThread(1);
                 });
+                st.IsBackground = true;
                 st.Start();
             }
             else if(flag_view_pll == true)
@@ -1567,6 +1623,7 @@ namespace GPM_View
                 {
                     createThread(2);
                 });
+                st.IsBackground = true;
                 st.Start();
             }
             else if(flag_viewPll_video == true)
@@ -1575,6 +1632,7 @@ namespace GPM_View
                 {
                     createThread(3);
                 });
+                st.IsBackground = true;
                 st.Start();
             }
             else

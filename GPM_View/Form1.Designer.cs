@@ -317,6 +317,7 @@ namespace GPM_View
             ((System.ComponentModel.ISupportInitialize)(this.nbThread)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+            this.TopMost = true;
 
         }
 
