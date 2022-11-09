@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -305,38 +306,18 @@ namespace GPM_View
                         addStatus(index, "Tìm kiếm theo key " + name);
                         active.searchKeyword(name);
                         Thread.Sleep(TimeSpan.FromSeconds(4));
-                        //search
-                        strKeyWork = Regex.Replace(strKeyWork, @"[^a-zA-Z0-9]", string.Empty);
 
-                        var eleVideos = driver.FindElements(By.XPath("//div[@class='text-wrapper style-scope ytd-video-renderer']"));
-                        for (int i = 0; i < eleVideos.Count; i++)
+                        var items = driver.FindElements(By.XPath("//ytd-video-renderer//ytd-thumbnail//a"));
+                        foreach (var item in items)
                         {
-                            string data = eleVideos[i].Text;
-                            string[] lines = data.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                            if (lines.Length < 4)
+                            string urlVideo = item.GetAttribute("href");
+                            if (urlVideo.Contains(strTenChannel))
                             {
-                                continue;
+                                executorUseData.ExecuteScript("arguments[0].click()", item);
+                                break;
                             }
-                            else
-                            {
-                                string strResult = Regex.Replace(lines[0], @"[^a-zA-Z0-9]", string.Empty).Trim();
-
-                                if (strResult.ToLower().Contains(strKeyWork.ToLower()) == false)
-                                {
-                                    continue;
-                                }
-                                if (lines[3].Trim().ToLower().Contains(strTenChannel.ToLower()) == false)
-                                {
-                                    continue;
-                                }
-                            }
-
-                            executorUseData.ExecuteScript("arguments[0].click()", eleVideos[i]);
-                            
-
-                            break;
                         }
-                        
+                        Thread.Sleep(TimeSpan.FromSeconds(2));
                         countTime time = new countTime();
 
                         int timevideo = 0;
@@ -354,7 +335,8 @@ namespace GPM_View
                             }
                             Thread.Sleep(1500);
                         }
-
+                        time.reset();
+                        Thread.Sleep(TimeSpan.FromSeconds(30));
                         addStatus(index, "Reset video ve 0");
                         // Khởi tạo đối tượng thuộc Actions class
                         Actions action = new Actions(driver);
@@ -420,6 +402,8 @@ namespace GPM_View
                         driver.FindElement(By.XPath("//a[@class='yt-simple-endpoint style-scope ytd-video-owner-renderer']")).Click();
 
                         Thread.Sleep(10000);
+                        
+                        //
                         driver.FindElement(By.XPath("//*[@id='tabsContent']/tp-yt-paper-tab[3]")).Click();
 
                         Thread.Sleep(10000);
@@ -434,6 +418,7 @@ namespace GPM_View
                             driver.FindElement(By.XPath("//*[@id='tabsContent']/tp-yt-paper-tab[4]")).Click();
                             Thread.Sleep(10000);
                             str = Convert.ToInt32(driver.ExecuteScript("var t = document.getElementsByClassName('ytd-playlist-thumbnail').length; return t;"));
+                            
                             int t = random.Next(0, str);
                             driver.ExecuteScript("document.getElementsByClassName('ytd-playlist-thumbnail')[" + t + "].click()");
                         }
@@ -805,37 +790,18 @@ namespace GPM_View
                         addStatus(index, "Tìm kiếm theo key " + name);
                         active.searchKeyword(name);
                         Thread.Sleep(TimeSpan.FromSeconds(4));
-                        strKeyWork = Regex.Replace(strKeyWork, @"[^a-zA-Z0-9]", string.Empty);
-                        //search
-                        var eleVideos = driver.FindElements(By.XPath("//div[@class='text-wrapper style-scope ytd-video-renderer']"));
-                        for (int i = 0; i < eleVideos.Count; i++)
+
+                        var items = driver.FindElements(By.XPath("//ytd-video-renderer//ytd-thumbnail//a"));
+                        foreach (var item in items)
                         {
-
-                            string data = eleVideos[i].Text;
-                            string[] lines = data.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                            if (lines.Length < 4)
+                            string urlVideo = item.GetAttribute("href");
+                            if (urlVideo.Contains(strTenChannel))
                             {
-                                continue;
+                                executorUseData.ExecuteScript("arguments[0].click()", item);
+                                break;
                             }
-                            else
-                            {
-                                string strResult = Regex.Replace(lines[0], @"[^a-zA-Z0-9]", string.Empty).Trim();
-
-                                if (strResult.ToLower().Contains(strKeyWork.ToLower()) == false)
-                                {
-                                    continue;
-                                }
-                                if (lines[3].Trim().ToLower().Contains(strTenChannel.ToLower()) == false)
-                                {
-                                    continue;
-                                }
-                            }
-
-                            executorUseData.ExecuteScript("arguments[0].click()", eleVideos[i]);
-
-                            break;
                         }
-
+                        Thread.Sleep(TimeSpan.FromSeconds(2));
                         countTime time = new countTime();
 
                         int timevideo = 0;
@@ -1176,36 +1142,18 @@ namespace GPM_View
                         addStatus(index, "Tìm kiếm theo key " + name);
                         active.searchKeyword(name);
                         Thread.Sleep(TimeSpan.FromSeconds(4));
-                        //search
-                        strKeyWork = Regex.Replace(strKeyWork, @"[^a-zA-Z0-9]", string.Empty);
 
-                        var eleVideos = driver.FindElements(By.XPath("//div[@class='text-wrapper style-scope ytd-video-renderer']"));
-                        for (int i = 0; i < eleVideos.Count; i++)
+                        var items = driver.FindElements(By.XPath("//ytd-video-renderer//ytd-thumbnail//a"));
+                        foreach (var item in items)
                         {
-                            string data = eleVideos[i].Text;
-                            string[] lines = data.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                            if (lines.Length < 4)
+                            string urlVideo = item.GetAttribute("href");
+                            if (urlVideo.Contains(strTenChannel))
                             {
-                                continue;
+                                executorUseData.ExecuteScript("arguments[0].click()", item);
+                                break;
                             }
-                            else
-                            {
-                                string strResult = Regex.Replace(lines[0], @"[^a-zA-Z0-9]", string.Empty).Trim();
-
-                                if (strResult.ToLower().Contains(strKeyWork.ToLower()) == false)
-                                {
-                                    continue;
-                                }
-                                if (lines[3].Trim().ToLower().Contains(strTenChannel.ToLower()) == false)
-                                {
-                                    continue;
-                                }
-                            }
-
-                            executorUseData.ExecuteScript("arguments[0].click()", eleVideos[i]);
-
-                            break;
                         }
+                        Thread.Sleep(TimeSpan.FromSeconds(2));
                         countTime time = new countTime();
 
                         int timevideo = 0;
@@ -1226,11 +1174,12 @@ namespace GPM_View
                         addStatus(index, "Time Video " + timevideo);
                        
                         time.reset();
-                        
-                        addStatus(index,"reset video time về 0");
+               
+                       
 
                         driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
                         Thread.Sleep(TimeSpan.FromSeconds(30));
+                        addStatus(index, "reset video time về 0");
 
                         Actions action = new Actions(driver);
 
@@ -1532,7 +1481,10 @@ namespace GPM_View
             }
 
             Process.Start("taskkill", "/F /IM gpmdriver.exe");
-            
+
+            flag_view_dx = false;
+            flag_view_dx = false;
+            flag_view_dx = false;
         }
         bool checkopentab = true;
 

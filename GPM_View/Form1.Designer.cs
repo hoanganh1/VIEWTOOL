@@ -37,18 +37,18 @@ namespace GPM_View
             this.APP_URL = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.sub = new System.Windows.Forms.CheckBox();
-            this.btnStop = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.txtChannel = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.btnSelectCommentFile = new System.Windows.Forms.Button();
             this.txtSoLanMoLink = new System.Windows.Forms.TextBox();
             this.txtKeyword = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.nbThread = new System.Windows.Forms.NumericUpDown();
             this.btnEmail = new System.Windows.Forms.Button();
+            this.btnStop = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.btnSelectCommentFile = new System.Windows.Forms.Button();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton3 = new System.Windows.Forms.RadioButton();
@@ -129,26 +129,14 @@ namespace GPM_View
             this.sub.UseVisualStyleBackColor = true;
             this.sub.CheckedChanged += new System.EventHandler(this.sub_CheckedChanged);
             // 
-            // btnStop
-            // 
-            this.btnStop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.btnStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnStop.Location = new System.Drawing.Point(209, 414);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(166, 55);
-            this.btnStop.TabIndex = 12;
-            this.btnStop.Text = "STOP";
-            this.btnStop.UseVisualStyleBackColor = false;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click_1);
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(7, 136);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(60, 17);
+            this.label3.Size = new System.Drawing.Size(67, 17);
             this.label3.TabIndex = 9;
-            this.label3.Text = "Channel";
+            this.label3.Text = "ID VIDEO";
             // 
             // txtChannel
             // 
@@ -165,6 +153,16 @@ namespace GPM_View
             this.label2.Size = new System.Drawing.Size(62, 17);
             this.label2.TabIndex = 7;
             this.label2.Text = "Keyword";
+            // 
+            // btnSelectCommentFile
+            // 
+            this.btnSelectCommentFile.Location = new System.Drawing.Point(10, 354);
+            this.btnSelectCommentFile.Name = "btnSelectCommentFile";
+            this.btnSelectCommentFile.Size = new System.Drawing.Size(165, 33);
+            this.btnSelectCommentFile.TabIndex = 6;
+            this.btnSelectCommentFile.Text = "Chọn file comment";
+            this.btnSelectCommentFile.UseVisualStyleBackColor = true;
+            this.btnSelectCommentFile.Click += new System.EventHandler(this.btnSelectCommentFile_Click);
             // 
             // txtSoLanMoLink
             // 
@@ -221,6 +219,18 @@ namespace GPM_View
             this.btnEmail.UseVisualStyleBackColor = true;
             this.btnEmail.Click += new System.EventHandler(this.btnEmail_Click);
             // 
+            // btnStop
+            // 
+            this.btnStop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.btnStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnStop.Location = new System.Drawing.Point(209, 414);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(166, 55);
+            this.btnStop.TabIndex = 12;
+            this.btnStop.Text = "STOP";
+            this.btnStop.UseVisualStyleBackColor = false;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click_1);
+            // 
             // textBox1
             // 
             this.textBox1.BackColor = System.Drawing.Color.White;
@@ -229,16 +239,6 @@ namespace GPM_View
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(591, 220);
             this.textBox1.TabIndex = 2;
-            // 
-            // btnSelectCommentFile
-            // 
-            this.btnSelectCommentFile.Location = new System.Drawing.Point(10, 354);
-            this.btnSelectCommentFile.Name = "btnSelectCommentFile";
-            this.btnSelectCommentFile.Size = new System.Drawing.Size(165, 33);
-            this.btnSelectCommentFile.TabIndex = 6;
-            this.btnSelectCommentFile.Text = "Chọn file comment";
-            this.btnSelectCommentFile.UseVisualStyleBackColor = true;
-            this.btnSelectCommentFile.Click += new System.EventHandler(this.btnSelectCommentFile_Click);
             // 
             // radioButton1
             // 
@@ -310,6 +310,7 @@ namespace GPM_View
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Youtube View";
+            this.TopMost = true;
             this.Load += new System.EventHandler(this.Form1_Load_1);
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).EndInit();
             this.groupBox1.ResumeLayout(false);
@@ -317,7 +318,6 @@ namespace GPM_View
             ((System.ComponentModel.ISupportInitialize)(this.nbThread)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-            this.TopMost = true;
 
         }
 

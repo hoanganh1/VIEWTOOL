@@ -169,10 +169,10 @@ namespace GPM_View
                 {
                     return 0;
                 }
-                if(total < 200)
+                /*if(total < 200)
                 {
                     return 0;
-                }
+                }*/
                 return total;
             }
             catch
