@@ -169,10 +169,10 @@ namespace GPM_View
                 {
                     return 0;
                 }
-                /*if(total < 200)
+                if(total < 200)
                 {
                     return 0;
-                }*/
+                }
                 return total;
             }
             catch
@@ -254,7 +254,8 @@ namespace GPM_View
                 }
                 var send = driver.FindElement(By.XPath("//ytd-comment-simplebox-renderer//yt-formatted-string//div"));
                 senComment(send, text);
-                driver.FindElement(By.XPath("//ytd-comment-simplebox-renderer//ytd-button-renderer[@id='submit-button']//tp-yt-paper-button")).Click();
+                Thread.Sleep(3000);
+                driver.FindElement(By.XPath("//ytd-comment-simplebox-renderer//ytd-button-renderer[@id='submit-button']//yt-button-shape")).Click();
                 Thread.Sleep(6000);
                 return true;
             }
