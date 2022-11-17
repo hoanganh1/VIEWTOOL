@@ -1646,8 +1646,10 @@ namespace GPM_View
             checkopentab = !checkopentab;
         }
 
+        // chay
         private void button2_Click_1(object sender, EventArgs e)
         {
+            
             iSoLuongDangChay = 0;
             iSoLuongEmail = dataGrid.Rows.Count;
 
