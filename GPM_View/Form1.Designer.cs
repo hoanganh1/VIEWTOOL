@@ -53,6 +53,8 @@ namespace GPM_View
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton3 = new System.Windows.Forms.RadioButton();
             this.button2 = new System.Windows.Forms.Button();
+            this.btnTimKiem = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nbThread)).BeginInit();
@@ -108,6 +110,7 @@ namespace GPM_View
             this.APP_URL.Name = "APP_URL";
             this.APP_URL.Size = new System.Drawing.Size(100, 23);
             this.APP_URL.TabIndex = 17;
+            this.APP_URL.TextChanged += new System.EventHandler(this.APP_URL_TextChanged);
             // 
             // label5
             // 
@@ -294,11 +297,35 @@ namespace GPM_View
             this.button2.UseVisualStyleBackColor = false;
             this.button2.Click += new System.EventHandler(this.button2_Click_1);
             // 
+            // btnTimKiem
+            // 
+            this.btnTimKiem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.btnTimKiem.Location = new System.Drawing.Point(414, 345);
+            this.btnTimKiem.Name = "btnTimKiem";
+            this.btnTimKiem.Size = new System.Drawing.Size(166, 55);
+            this.btnTimKiem.TabIndex = 13;
+            this.btnTimKiem.Text = "Trang kenh";
+            this.btnTimKiem.UseVisualStyleBackColor = false;
+            this.btnTimKiem.Click += new System.EventHandler(this.btnTimKiem_Click);
+            // 
+            // button3
+            // 
+            this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.button3.Location = new System.Drawing.Point(414, 406);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(166, 55);
+            this.button3.TabIndex = 14;
+            this.button3.Text = "PlayList";
+            this.button3.UseVisualStyleBackColor = false;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(793, 478);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.btnTimKiem);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.radioButton3);
             this.Controls.Add(this.radioButton2);
@@ -341,12 +368,12 @@ namespace GPM_View
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox txtSoLanMoLink;
         private System.Windows.Forms.Button btnSelectCommentFile;
-        private DataGridViewCellEventHandler dataGrid_CellContentClick;
-        private EventHandler textBox1_TextChanged;
         private RadioButton radioButton1;
         private RadioButton radioButton2;
         private RadioButton radioButton3;
         private Button button2;
+        private Button btnTimKiem;
+        private Button button3;
     }
 }
 

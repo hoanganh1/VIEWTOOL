@@ -3,3 +3,13 @@
 ################################################################################
 
 /packages/Newtonsoft.Json.13.0.1/lib/net40/Newtonsoft.Json.xml
+/GPM_View/bin/Debug/Error.txt
+/GPM_View/bin/Debug/
+/GPM_View/obj
+/.vs
+/GPM_View/bin/
+/GPM_View/obj/
+*.exe
+*.pdb
+*.manifest
+*.cache

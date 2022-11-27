@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Security.Policy;
 using System.Text;
 using System.Threading;
@@ -261,7 +262,7 @@ namespace GPM_View
             }
             catch { return false; }
         }
-        void senComment(IWebElement Xpath,string daya)
+        public void senComment(IWebElement Xpath,string daya)
         {
             foreach(var item in daya)
             {
@@ -270,5 +271,193 @@ namespace GPM_View
                 Thread.Sleep(50);
             }
         }
+
+        public void scroll()
+        {
+            Random random = new Random();
+
+            int x = (random.Next(1,1000));
+            int j = (random.Next(1, 500));
+            driver.ExecuteScript("window.scrollTo(100," + (x * j + ")"));
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(8);
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+            driver.ExecuteScript("window.scrollTo({ top: 0, behavior: 'smooth' });");
+        }
+
+        public void viewVideo(int totalTimeVideo, int startPercent, int endPercent)
+        {
+            int timeAction = 20;
+            Actions action = new Actions(driver);
+
+            // Start video
+            action.KeyDown(OpenQA.Selenium.Keys.NumberPad0);
+            action.SendKeys(OpenQA.Selenium.Keys.NumberPad0).Perform();
+
+            int rand = random.Next(startPercent, endPercent);
+            int sleepTime = rand * totalTimeVideo / 100;
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(12);
+            Thread.Sleep(TimeSpan.FromSeconds(10));
+
+            //Scroll after 20min
+            if (sleepTime > timeAction * 60)
+            {
+                int sleepCount = sleepTime / (timeAction*60);
+                int sleepCountDiv = sleepTime % (timeAction*60);
+                if (sleepCountDiv > 0)
+                {
+                    sleepCount += 1;
+                }
+                for (int j = 0; j < sleepCount; j++)
+                {
+                    if (j == sleepCount - 1)
+                    {
+                        driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(sleepCountDiv);
+                        Thread.Sleep(TimeSpan.FromSeconds(sleepCountDiv));
+                    }
+                    else
+                    {
+                        viewVideoInTimeAction(timeAction*60);
+                    }
+                }
+                
+            }
+            else
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(sleepTime));
+            }
+            Thread.Sleep(5000);
+        }
+
+        public void viewVideoInTimeAction(int sleepTime)
+        {
+            int div = sleepTime / 60;
+            int count = sleepTime % 60;
+            if(div> 0)
+            {
+                count += 1;
+            }
+
+            for(int i= 0; i< count; i++)
+            {
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(60);
+                Thread.Sleep(TimeSpan.FromSeconds(60));
+                if (i % 3 == 0)
+                {
+                    viewComment();
+                    scrollToTop();
+                }
+                if(i == 1)
+                {
+                    likeVideo();
+                }
+
+                if(i % 7 == 0)
+                {
+                    pauseVideo();
+                    resumeVideo();
+                }
+
+            }
+        }
+
+
+        public void viewComment()
+        {
+            Random random = new Random();
+            int x = (random.Next(1, 1000));
+            int j = (random.Next(1, 1000));
+            driver.ExecuteScript("window.scrollTo(100," + (x * j + ")"));
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(8);
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+        }
+
+        public void scrollToTop()
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+            driver.ExecuteScript("window.scrollTo({ top: 0, behavior: 'smooth' });");
+        }
+
+        public void pauseVideo()
+        {
+            Actions action = new Actions(driver);
+            // Pause video
+            action.SendKeys(OpenQA.Selenium.Keys.Space).Perform();
+        }
+
+        public void resumeVideo()
+        {
+            Actions action = new Actions(driver);
+            // Resume video
+            action.SendKeys(OpenQA.Selenium.Keys.Space).Perform();
+        }
+
+        public void seekVideo(int percent)
+        {
+            string key = "";
+            Actions action = new Actions(driver);
+            switch (percent)
+            {
+                case 1:
+                    key = OpenQA.Selenium.Keys.NumberPad1;
+                    break;
+                case 2:
+                    key = OpenQA.Selenium.Keys.NumberPad2;
+                    break;
+                case 3:
+                    key = OpenQA.Selenium.Keys.NumberPad3;
+                    break;
+                case 4:
+                    key = OpenQA.Selenium.Keys.NumberPad4; 
+                    break;
+                case 5:
+                    key = OpenQA.Selenium.Keys.NumberPad5;
+                    break;
+                case 6:
+                    key = OpenQA.Selenium.Keys.NumberPad6;
+                    break;
+                case 7:
+                    key = OpenQA.Selenium.Keys.NumberPad7;
+                    break;
+                case 8:
+                    key = OpenQA.Selenium.Keys.NumberPad8;
+                    break;
+                case 9:
+                    key = OpenQA.Selenium.Keys.NumberPad9; 
+                    break;
+                default:
+                    action.SendKeys(key).Perform();
+                    break;
+            }
+                // seek video
+                action.SendKeys(key).Perform();
+         }
+
+        public void prevVideo()
+        {
+            Actions action = new Actions(driver);
+            // Next video
+            action.KeyDown(OpenQA.Selenium.Keys.Shift).SendKeys("p").Perform();
+        }
+        public void nextVideo()
+        {
+            Actions action = new Actions(driver);
+            // Next video
+            action.KeyDown(OpenQA.Selenium.Keys.Shift).SendKeys("s").Perform();
+        }
+
+        public void ceek10sNext()
+        {
+            Actions action = new Actions(driver);
+            // Next 10s
+            action.SendKeys("l").Perform();
+        }
+
+        public void ceek10sPrev()
+        {
+            Actions action = new Actions(driver);
+            // Prev 10s
+            action.SendKeys("j").Perform();
+        }
+
     }
 }

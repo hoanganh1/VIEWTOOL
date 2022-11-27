@@ -1546,15 +1546,6 @@ namespace GPM_View
         {
 
         }
-        string ConvertListToString()
-        {
-            string data = "";
-            foreach (var item in lstLink.ToList())
-            {
-                data += item.link_yt + "|" + item.count + "\r\n";
-            }
-            return data;
-        }
         private void Form1_Load(object sender, EventArgs e)
         {
         }
@@ -1562,7 +1553,7 @@ namespace GPM_View
         {
             try { File.WriteAllText("data\\phut.txt", countTimeAll.ToString()); } catch { Thread.Sleep(100); }
         }
-        List<link> lstLink;
+    
 
         void clearchrome()
         {
@@ -1708,5 +1699,497 @@ namespace GPM_View
         {
 
         }
+
+        private void btnTimKiem_Click(object sender, EventArgs e)
+        {
+            int kichban = 1;
+            switch (kichban)
+            {
+                case 1:
+                    trangKenhKichBan1();
+                    break;
+                case 2:
+                    trangKenhKichBan2();
+                    break;
+                case 3:
+                    trangKenhKichBan3();
+                    break;
+            }
+
+        }
+
+        void trangKenhKichBan1()
+        {
+
+        }
+
+        void trangKenhKichBan2()
+        {
+
+        }
+
+        void trangKenhKichBan3()
+        {
+
+        }
+
+        void trangKenhKichBan4()
+        {
+
+        }
+
+        UndetectChromeDriver driver = null;
+        private void logIn()
+        {
+            int dem_kb1 = 0;
+            int index = numberRow;
+            numberRow += 1;
+            if (index >= dataGrid.Rows.Count)
+            {
+                return;
+            }
+            if (!checkopentab)
+            {
+                return;
+            }
+            account act = lstAccount[index];
+           
+            try
+            {
+                addStatus(index, "starting");
+                GPMLoginAPI api = new GPMLoginAPI("http://" + APP_URL.Text);
+                acton sts = new acton(act, api);
+                Thread.Sleep(1000);
+                JObject ojb = sts.getLst(act.email, profiles);
+                string id_profile = "";
+                if (ojb == null)
+                {
+                    int prox = proxyNumber;
+                    loadProxy();
+                    proxyNumber += 1;
+                    if (prox >= lstProxy.Count)
+                    {
+                        proxyNumber = 0;
+                        prox = proxyNumber;
+                    }
+                    string proxy = lstProxy[prox];
+                    resave(proxy);
+
+                    ojb = api.Create(act.email, proxy, true);
+                    if (ojb != null)
+                    {
+                        //Tạo thành công
+                        id_profile = ojb["profile_id"].ToString();
+                        addStatus(index, "tạo profile thành công");
+                        saveProfile(act, proxy);
+                    }
+                }
+                else
+                {
+                    //đã có profile
+                    id_profile = ojb["id"].ToString();
+                }
+                Thread.Sleep(1000);
+
+                bool lockWasTaken = false;
+                var temp = obj;
+                try
+                {
+                    Monitor.Enter(temp, ref lockWasTaken);
+                    addStatus(index, "đang mở profile");
+                    try { driver = sts.openProfile(id_profile, index); }
+                    catch
+                    {
+                        addStatus(index, "Lỗi mở profile");
+                        saveError(act, "Lỗi mở profile");
+                        goto ketthuc;
+                    }
+                }
+                finally
+                {
+                    if (lockWasTaken)
+                    {
+                        Monitor.Exit(temp);
+                    }
+                }
+                while (dem_kb1 < nbThread.Value - 1)
+                {
+                    dem_kb1++;
+                    Thread.Sleep(2000);
+                }
+                addStatus(index, "truy cập google");
+
+                try { driver.Get(urlLogin); }
+
+                catch
+                {
+                    addStatus(index, "Lỗi truy cập google !");
+                    driver.Close();
+                    driver.Dispose();
+                    driver.Quit();
+                    goto ketthuc;
+                }
+
+                if (driver.Url.Contains("business.google.com/create/new"))
+                {
+                    goto searchz;
+                }
+                login st = new login(driver, act); int demnha = 0;
+                string Error = string.Empty;
+            lainha:
+                if (st.Nanial(urlLogin))
+                {
+                    if (!st.StartLogin(out Error))
+                    {
+                        if (Error == "captcha")
+                        {
+                            demnha += 1;
+                            if (demnha == 7)
+                            {
+                                addStatus(index, "Lỗi captcha !");
+                                driver.Close();
+                                driver.Dispose();
+                                driver.Quit();
+                                goto ketthuc;
+                            }
+                            goto lainha;
+                        }
+
+                        //Cảnh bảo lỗi
+                    }
+                }
+                Thread.Sleep(TimeSpan.FromSeconds(3));
+
+                addStatus(index, "Đã login mail !");
+                clickDeSau(driver); Thread.Sleep(TimeSpan.FromSeconds(5));
+                if (driver.Url.Contains("inoptions/recovery-options-collection"))
+                {
+                    driver.Navigate().GoToUrl(urlLogin);
+                    Thread.Sleep(TimeSpan.FromSeconds(5));
+                }
+                if (driver.Url.Contains("om/signin/v2/challenge/iap") || (driver.Url.Contains("gle.com/signin/rejected")))
+                {
+                    saveError(act, "Very phone");
+                    addStatus(index, "very phone !");
+                    driver.Close();
+                    driver.Dispose();
+                    driver.Quit();
+                    goto ketthuc;
+                }
+                if (driver.Url.Contains(".com/interstitials/birthday") || (driver.Url.Contains("ogle.com/web/chip")) || (driver.Url.Contains("/info/unknownerror")))
+                {
+                    addStatus(index, "Vui lòng thêm ngày sinh");
+                    addbirthday(driver);
+                }
+                if ((driver.Url.Contains("m/signin/v2/identifier")) || (driver.Url.Contains("ccounts.google.com/speedbump/idvreenable")) || (driver.Url.Contains("m/signin/v2/disabled/explanation")))
+                {
+                    saveError(act, "Đăng nhập không thành công!");
+                    addStatus(index, "Đăng nhập không thành công");
+                    driver.Close();
+                    driver.Dispose();
+                    driver.Quit();
+                    goto ketthuc;
+                }
+                if (driver.Url.Contains("ogle.com/web/chip"))
+                {
+                    addbirthday(driver);
+                }
+            searchz:
+                if (driver.Url.Contains("/signin/v2/challenge/pwd"))
+                {
+                    saveError(act, "Đăng nhập không thành công");
+                    addStatus(index, "Đăng nhập không thành công");
+                    driver.Close();
+                    driver.Dispose();
+                    driver.Quit();
+                    goto ketthuc;
+                }
+                else
+                {
+                    acYoutube active = new acYoutube(driver);
+                    active.gotoHome();
+                    Thread.Sleep(2000);
+                vireyt:
+                    try
+                    {
+                        IJavaScriptExecutor executorUseData = driver;
+                        string name = txtKeyword.Text;
+                        addStatus(index, "Tìm kiếm theo key " + name);
+                        active.searchKeyword(name);
+                        Thread.Sleep(TimeSpan.FromSeconds(4));
+
+
+                        //find chanel name
+                       
+                        var items = driver.FindElements(By.XPath("//*[@id=\"channel-title\"]"));
+
+                        foreach (var item in items)
+                        {
+                            string urlVideo = item.GetAttribute("href");
+                            Console.WriteLine(item.Text);
+                            executorUseData.ExecuteScript("arguments[0].click()", item);
+
+
+                            if (urlVideo.Contains(strTenChannel))
+                            {
+                                executorUseData.ExecuteScript("arguments[0].click()", item);
+                                break;
+                            }
+                        }
+                        Thread.Sleep(TimeSpan.FromSeconds(2));
+
+
+                        int rand = random.Next(80, 99);
+                        int timevideo = 0;
+
+                        for (int i = 0; i < iSoLanMoLink; i++)
+                        {
+                            bool is_comment = false;
+                            int rand_num_cmt = random.Next(2, 5); // random comment o moi lan click link
+                            countTime time = new countTime();
+
+                            for (int k = 0; k < 300; k++)
+                            {
+                                if (k % 50 == 0)
+                                {
+                                    driver.Navigate().Refresh();
+                                    Thread.Sleep(2000);
+                                }
+                                timevideo = active.getTimeVideo();
+                                if (timevideo != 0)
+                                {
+                                    break;
+                                }
+                                Thread.Sleep(1500);
+                            }
+                            addStatus(index, "Time Video " + timevideo);
+                            Thread.Sleep(3000);
+                            time.reset();
+
+                            Thread.Sleep(TimeSpan.FromSeconds(30));
+                            addStatus(index, "Reset video ve 0");
+                            // Khởi tạo đối tượng thuộc Actions class
+                            Actions action = new Actions(driver);
+
+                            action.KeyDown(OpenQA.Selenium.Keys.NumberPad0);
+
+                            action.SendKeys(OpenQA.Selenium.Keys.NumberPad0).Perform();
+                            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(6);
+                            Thread.Sleep(TimeSpan.FromSeconds(5));
+
+                            rand = random.Next(80, 99);
+
+                            int sleepTime = rand * timevideo / 100;
+                            addStatus(index, "Chuyen video sau : " + sleepTime + " s");
+                            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(12);
+                            Thread.Sleep(TimeSpan.FromSeconds(10));
+                            if (sub.Checked)
+                            {
+
+                                try { active.subVideo(); }
+                                catch
+                                {
+                                    continue;
+                                }
+                                Thread.Sleep(5000);
+                                if (sleepTime > 1 * 60)
+                                {
+                                    int sleepCount = sleepTime / (60);
+                                    int sleepCountDiv = sleepTime % 60;
+                                    if (sleepCountDiv > 0)
+                                    {
+                                        sleepCount += 1;
+                                    }
+                                    for (int j = 0; j < sleepCount; j++)
+                                    {
+                                        if (j == sleepCount - 1)
+                                        {
+                                            addStatus(index, sleepCountDiv.ToString());
+                                            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(sleepTime + 2 - (j - 1) * 60);
+                                            Thread.Sleep(TimeSpan.FromSeconds(sleepCountDiv));
+                                        }
+                                        else
+                                        {
+                                            if (i > 0)
+                                            {
+                                                addStatus(index, "đang xem video lần click thứ" + i);
+                                            }
+
+                                            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1 * 60);
+                                            Thread.Sleep(TimeSpan.FromMinutes(1));
+                                            if ((j + 1) % 20 == 0)
+                                            {
+                                                int x = 100;
+                                                driver.ExecuteScript("window.scrollTo(100," + (x * j + ")"));
+                                                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(4);
+                                                Thread.Sleep(TimeSpan.FromSeconds(2));
+                                                addStatus(index, "2s");
+                                                driver.ExecuteScript("window.scrollTo({ top: 0, behavior: 'smooth' });");
+
+                                            }
+                                            if (is_comment == false)
+                                            {
+                                                if (i % rand_num_cmt == 0) // comment tai lan click Des random
+                                                {
+                                                    int rand_commenTime = random.Next(1, sleepCount); //comment tai so phut random
+                                                    if (j == rand_commenTime)
+                                                    {
+                                                        if (listComments.Count > 0)
+                                                        {
+                                                            try
+                                                            {
+                                                                int randomCommend = random.Next(listComments.Count);
+                                                                active.goToComment(listComments[randomCommend]);
+                                                                is_comment = true;
+                                                                Thread.Sleep(6000);
+                                                            }
+                                                            catch
+                                                            {
+                                                                continue;
+                                                            }
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(sleepTime + 2);
+                                Thread.Sleep(TimeSpan.FromSeconds(sleepTime));
+
+                            }
+                            if (i != iSoLanMoLink - 1)
+                            {
+                                int x = 100;
+                                driver.ExecuteScript("window.scrollTo(100," + (x * 2 + ")"));
+                                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(4);
+                                Thread.Sleep(TimeSpan.FromSeconds(2));
+                                addStatus(index, "2s");
+                                driver.ExecuteScript("window.scrollTo({ top: 0, behavior: 'smooth' });");
+
+                                addStatus(index, "Sleep 5s");
+                                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5 + 2);
+                                Thread.Sleep(TimeSpan.FromSeconds(5));
+                                addStatus(index, "Sleep 5s1");
+                                try
+                                {
+                                    /* driver.FindElement(By.XPath("/html/body/ytd-app/div[1]/ytd-page-manager/ytd-watch-flexy/div[5]/div[1]/div/div[2]/ytd-watch-metadata/div/div[3]/div[1]/div/ytd-text-inline-expander/div[1]/span[1]/yt-formatted-string/a[1]")).Click();*/
+                                    var eleDes = driver.FindElement(By.XPath("//div[@id='description']"));
+                                    executorUseData.ExecuteScript("arguments[0].click()", eleDes);
+                                    Thread.Sleep(2000);
+                                    string contentDes = driver.FindElement(By.XPath("//div[@id='description']")).Text;
+                                    string[] lines = contentDes.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+                                    string linkDes = lines.FirstOrDefault(t => t.StartsWith("http", StringComparison.OrdinalIgnoreCase));
+
+                                    if (string.IsNullOrWhiteSpace(linkDes))
+                                    {
+                                        iSoLuongDangChay--;
+                                        addStatus(index, "Xong");
+                                        try
+                                        {
+                                            driver.Close();
+                                            driver.Quit();
+                                        }
+                                        catch
+                                        {
+                                            driver.Navigate().GoToUrl(linkDes);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        addStatus(index, "Chạy link ở des: " + i);
+                                        driver.Navigate().GoToUrl(linkDes);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    addStatus(index, "Sleep 5s1 ERROR" + e);
+                                }
+                                addStatus(index, "Sleep 5s2");
+
+                                addStatus(index, "click description");
+                                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5 + 2);
+                                Thread.Sleep(TimeSpan.FromSeconds(5));
+                            }
+                        }
+                        addStatus(index, "Xong");
+                        driver.Close();
+                        driver.Dispose();
+                        driver.Quit();
+                    }
+                    catch (Exception ex) // catch 1
+                    {
+                        addStatus(index, "timeout access youtube ");
+                        driver.Close();
+                        driver.Dispose();
+                        driver.Quit();
+                        goto ketthuc;
+                    }
+                }
+            }
+            catch (Exception ex) // catch 1
+            {
+                addStatus(index, ex.Message.ToString());
+                goto ketthuc;
+            }
+        ketthuc:
+            runNew(1);
+            return;
+        }
+
+
+        private void APP_URL_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            int kichban = 1;
+            switch (kichban)
+            {
+                case 1:
+                    playListKichBan1();
+                    break;
+                case 2:
+                    playListKichBan2();
+                    break;
+                case 3:
+                    playListKichBan3();
+                    break;
+            }
+        }
+
+        void playListKichBan1()
+        {
+            logIn();
+            acYoutube action = new acYoutube(driver);
+            int timeVideo = action.getTimeVideo();
+            action.viewVideo(timeVideo, 80, 90);
+            action.nextVideo();
+            
+        }
+
+        void playListKichBan2()
+        {
+            logIn();
+            acYoutube action = new acYoutube(driver);
+            int timeVideo = action.getTimeVideo();
+            action.viewVideo(timeVideo, 80, 90);
+        }
+
+        void playListKichBan3()
+        {
+            logIn();
+            acYoutube action = new acYoutube(driver);
+            int timeVideo = action.getTimeVideo();
+            action.viewVideo(timeVideo, 80, 90);
+        }
+
     }  
     }
