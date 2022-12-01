@@ -10,7 +10,7 @@ namespace GPM_View
 {
     public class UndetectChromeDriver : ChromeDriver
     {
-        public UndetectChromeDriver(ChromeDriverService service, ChromeOptions options) : base(service, options)
+        public UndetectChromeDriver(ChromeDriverService service, ChromeOptions options) : base(service, options, new TimeSpan(0, 5, 0))
         {
             options.AddAdditionalOption("useAutomationExtension", false);
             options.AddExcludedArgument("enable-automation");
@@ -21,7 +21,6 @@ namespace GPM_View
         public void Get(string url)
         {
             removeCdcProps();
-
             this.Navigate().GoToUrl(url);
         }
 

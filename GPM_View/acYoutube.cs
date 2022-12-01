@@ -1,10 +1,17 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
+using System;
+using System.Net;
+using System.Threading;
+
+using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Interactions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Security.Policy;
 using System.Text;
 using System.Threading;
@@ -64,7 +71,7 @@ namespace GPM_View
                 string idVideo = getXpathVideo(urrl);
                 var item = driver.FindElements(By.XPath("//ytd-video-renderer//ytd-thumbnail//a"));
                 int number = 0;
-                foreach(var temp in item)
+                foreach (var temp in item)
                 {
                     string urlVideo = temp.GetAttribute("href");
                     if (urlVideo.Contains(idVideo))
@@ -107,10 +114,10 @@ namespace GPM_View
             try
             {
                 int str = Convert.ToInt32(driver.ExecuteScript("var t = document.getElementsByClassName('ytd-playlist-thumbnail').length; return t;"));
-                if(str > 0)
+                if (str > 0)
                 {
                     int t = random.Next(0, str);
-                    driver.ExecuteScript("document.getElementsByClassName('ytd-playlist-thumbnail')["+ t + "].click()");
+                    driver.ExecuteScript("document.getElementsByClassName('ytd-playlist-thumbnail')[" + t + "].click()");
                 }
                 return true;
             }
@@ -120,7 +127,7 @@ namespace GPM_View
         {
             try
             {
-                
+
                 var lop = driver.FindElement(By.XPath("//ytd-playlist-loop-button-renderer//button[@class='style-scope yt-icon-button']"));
                 string title = lop.GetAttribute("aria-label");
                 if ((title == "Loop video") || (lop.GetAttribute("aria-label") == "Видеог давтах"))
@@ -131,7 +138,7 @@ namespace GPM_View
                 else { lop.Click(); }
                 Thread.Sleep(500);
                 var rand = driver.FindElement(By.XPath("//ytd-menu-renderer//ytd-toggle-button-renderer[@class='style-scope ytd-menu-renderer style-grey-text size-default']//button[@class='style-scope yt-icon-button']"));
-                if((rand.GetAttribute("aria-label") == "Shuffle playlist") || (rand.GetAttribute("aria-label") == "Тоглуулах жагсаалтыг холих"))
+                if ((rand.GetAttribute("aria-label") == "Shuffle playlist") || (rand.GetAttribute("aria-label") == "Тоглуулах жагсаалтыг холих"))
                 {
 
                 }
@@ -141,10 +148,10 @@ namespace GPM_View
             }
             catch { return false; }
         }
-        public bool checkPercen(int count,int all,int limit )
+        public bool checkPercen(int count, int all, int limit)
         {
             int result = ((count * 100) / all);
-            if(limit <= result)
+            if (limit <= result)
             {
                 return true;
             }
@@ -157,7 +164,7 @@ namespace GPM_View
                 string str = Convert.ToString(driver.ExecuteScript("var t = document.getElementsByClassName('ytp-time-duration')[0].textContent; return t;"));
                 int total = 0;
                 var item = str.Split(':');
-                if(item.Length == 3)
+                if (item.Length == 3)
                 {
                     total += Convert.ToInt32(item[0]) * 3600 + Convert.ToInt32(item[1]) * 60 + Convert.ToInt32(item[2]);
                 }
@@ -169,7 +176,7 @@ namespace GPM_View
                 {
                     return 0;
                 }
-                if(total < 200)
+                if (total < 200)
                 {
                     return 0;
                 }
@@ -217,7 +224,9 @@ namespace GPM_View
                 try { driver.ExecuteScript("document.getElementsByClassName('style-scope ytd-subscribe-button-renderer')[1].click()"); Thread.Sleep(3000); } catch { }
 
 
-                try { driver.ExecuteScript("document.getElementsByClassName('ytd-subscription-notification-toggle-button-renderer')[0].click()");
+                try
+                {
+                    driver.ExecuteScript("document.getElementsByClassName('ytd-subscription-notification-toggle-button-renderer')[0].click()");
                     Thread.Sleep(3000);
                     try
                     {
@@ -225,7 +234,9 @@ namespace GPM_View
                     }
                     catch { }
                     Thread.Sleep(3000);
-                } catch { 
+                }
+                catch
+                {
                 }
 
                 return true;
@@ -234,7 +245,7 @@ namespace GPM_View
         }
         public bool goToComment(string text)
         {
-            
+
             try
             {
                 int x = 100;
@@ -261,14 +272,202 @@ namespace GPM_View
             }
             catch { return false; }
         }
-        void senComment(IWebElement Xpath,string daya)
+        public void senComment(IWebElement Xpath, string daya)
         {
-            foreach(var item in daya)
+            foreach (var item in daya)
             {
                 Actions actionss = new Actions(driver);
-                actionss.MoveToElement(Xpath).SendKeys(item +"").Build().Perform();
+                actionss.MoveToElement(Xpath).SendKeys(item + "").Build().Perform();
                 Thread.Sleep(50);
             }
         }
+
+        public void scroll()
+        {
+            Random random = new Random();
+
+            int x = (random.Next(1, 1000));
+            int j = (random.Next(1, 500));
+            driver.ExecuteScript("window.scrollTo(100," + (x * j + ")"));
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(8);
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+            driver.ExecuteScript("window.scrollTo({ top: 0, behavior: 'smooth' });");
+        }
+
+        public void viewVideo(int totalTimeVideo, int startPercent, int endPercent)
+        {
+            int timeAction = 20;
+            Actions action = new Actions(driver);
+
+            // Start video
+            action.KeyDown(OpenQA.Selenium.Keys.NumberPad0);
+            action.SendKeys(OpenQA.Selenium.Keys.NumberPad0).Perform();
+
+            int rand = random.Next(startPercent, endPercent);
+            int sleepTime = rand * totalTimeVideo / 100;
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(12);
+            Thread.Sleep(TimeSpan.FromSeconds(10));
+
+            //Scroll after 20min
+            if (sleepTime > timeAction * 60)
+            {
+                int sleepCount = sleepTime / (timeAction * 60);
+                int sleepCountDiv = sleepTime % (timeAction * 60);
+                if (sleepCountDiv > 0)
+                {
+                    sleepCount += 1;
+                }
+                for (int j = 0; j < sleepCount; j++)
+                {
+                    if (j == sleepCount - 1)
+                    {
+                        driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(sleepCountDiv);
+                        Thread.Sleep(TimeSpan.FromSeconds(sleepCountDiv));
+                    }
+                    else
+                    {
+                        viewVideoInTimeAction(timeAction * 60);
+                    }
+                }
+
+            }
+            else
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(sleepTime));
+            }
+            Thread.Sleep(5000);
+        }
+
+        public void viewVideoInTimeAction(int sleepTime)
+        {
+            int div = sleepTime / 60;
+            int count = sleepTime % 60;
+            if (div > 0)
+            {
+                count += 1;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(60);
+                Thread.Sleep(TimeSpan.FromSeconds(60));
+                if (i % 3 == 0)
+                {
+                    viewComment();
+                    scrollToTop();
+                }
+                if (i == 1)
+                {
+                    likeVideo();
+                }
+
+                if (i % 7 == 0)
+                {
+                    pauseVideo();
+                    resumeVideo();
+                }
+
+            }
+        }
+
+
+        public void viewComment()
+        {
+            Random random = new Random();
+            int x = (random.Next(1, 1000));
+            int j = (random.Next(1, 1000));
+            driver.ExecuteScript("window.scrollTo(100," + (x * j + ")"));
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(8);
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+        }
+
+        public void scrollToTop()
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+            driver.ExecuteScript("window.scrollTo({ top: 0, behavior: 'smooth' });");
+        }
+
+        public void pauseVideo()
+        {
+            Actions action = new Actions(driver);
+            // Pause video
+            action.SendKeys(OpenQA.Selenium.Keys.Space).Perform();
+        }
+
+        public void resumeVideo()
+        {
+            Actions action = new Actions(driver);
+            // Resume video
+            action.SendKeys(OpenQA.Selenium.Keys.Space).Perform();
+        }
+
+        public void seekVideo(int percent)
+        {
+            string key = "";
+            Actions action = new Actions(driver);
+            switch (percent)
+            {
+                case 1:
+                    key = OpenQA.Selenium.Keys.NumberPad1;
+                    break;
+                case 2:
+                    key = OpenQA.Selenium.Keys.NumberPad2;
+                    break;
+                case 3:
+                    key = OpenQA.Selenium.Keys.NumberPad3;
+                    break;
+                case 4:
+                    key = OpenQA.Selenium.Keys.NumberPad4;
+                    break;
+                case 5:
+                    key = OpenQA.Selenium.Keys.NumberPad5;
+                    break;
+                case 6:
+                    key = OpenQA.Selenium.Keys.NumberPad6;
+                    break;
+                case 7:
+                    key = OpenQA.Selenium.Keys.NumberPad7;
+                    break;
+                case 8:
+                    key = OpenQA.Selenium.Keys.NumberPad8;
+                    break;
+                case 9:
+                    key = OpenQA.Selenium.Keys.NumberPad9;
+                    break;
+                default:
+                    action.SendKeys(key).Perform();
+                    break;
+            }
+            // seek video
+            action.SendKeys(key).Perform();
+        }
+
+        public void prevVideo()
+        {
+            Actions action = new Actions(driver);
+            // Next video
+            action.KeyDown(OpenQA.Selenium.Keys.Shift).SendKeys("p").Perform();
+        }
+        public void nextVideo()
+        {
+            Actions action = new Actions(driver);
+            // Next video
+            action.KeyDown(OpenQA.Selenium.Keys.Shift).SendKeys("s").Perform();
+        }
+
+        public void ceek10sNext()
+        {
+            Actions action = new Actions(driver);
+            // Next 10s
+            action.SendKeys("l").Perform();
+        }
+
+        public void ceek10sPrev()
+        {
+            Actions action = new Actions(driver);
+            // Prev 10s
+            action.SendKeys("j").Perform();
+        }
+
     }
 }

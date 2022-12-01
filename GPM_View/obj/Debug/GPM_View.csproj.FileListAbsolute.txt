@@ -10,3 +10,27 @@ D:\UpdateTool\VIEWTOOL\GPM_View\obj\Debug\GPM_View.Properties.Resources.resource
 D:\UpdateTool\VIEWTOOL\GPM_View\obj\Debug\GPM_View.csproj.GenerateResource.Cache
 D:\UpdateTool\VIEWTOOL\GPM_View\obj\Debug\GPM_View.exe
 D:\UpdateTool\VIEWTOOL\GPM_View\obj\Debug\GPM_View.pdb
+D:\Youtube Software\VIEWTOOL\GPM_View\bin\Debug\GPM_View.exe.config
+D:\Youtube Software\VIEWTOOL\GPM_View\obj\Debug\GPM_View.exe
+D:\Youtube Software\VIEWTOOL\GPM_View\obj\Debug\GPM_View.pdb
+D:\Youtube Software\VIEWTOOL\GPM_View\bin\Debug\GPM_View.exe
+D:\Youtube Software\VIEWTOOL\GPM_View\bin\Debug\GPM_View.pdb
+D:\Youtube Software\VIEWTOOL\GPM_View\bin\Debug\Newtonsoft.Json.dll
+D:\Youtube Software\VIEWTOOL\GPM_View\bin\Debug\WebDriver.dll
+D:\Youtube Software\VIEWTOOL\GPM_View\bin\Debug\Newtonsoft.Json.xml
+D:\Youtube Software\VIEWTOOL\GPM_View\obj\Debug\GPM_View.csprojResolveAssemblyReference.cache
+D:\Youtube Software\VIEWTOOL\GPM_View\obj\Debug\GPM_View.Form1.resources
+D:\Youtube Software\VIEWTOOL\GPM_View\obj\Debug\GPM_View.Properties.Resources.resources
+D:\Youtube Software\VIEWTOOL\GPM_View\obj\Debug\GPM_View.csproj.GenerateResource.Cache
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\bin\Debug\GPM_View.exe.config
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\obj\Debug\GPM_View.exe
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\obj\Debug\GPM_View.pdb
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\bin\Debug\GPM_View.exe
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\bin\Debug\GPM_View.pdb
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\bin\Debug\WebDriver.dll
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\obj\Debug\GPM_View.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\obj\Debug\GPM_View.Form1.resources
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\obj\Debug\GPM_View.Properties.Resources.resources
+C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\obj\Debug\GPM_View.csproj.GenerateResource.Cache

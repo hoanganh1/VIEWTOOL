@@ -1,0 +1,18 @@
+emails|C:\Users\Admin\Desktop\ADD Claim ID\HAHA.txt
+idandkeyword|C:\Users\Admin\Desktop\ADD Claim ID\idandkey.txt
+commentslink|C:\Users\Admin\Desktop\ADD Claim ID\comments.txt
+subscriber|1|30
+comments|1|30
+like|1|30
+dislike|1|30
+skipads|1
+channelview|1
+searchview|1
+suggestview|1
+playlistview|1
+homeviews|1
+repeat|1
+threads|50
+defaultsuggest|1
+randomsuggest|1
+customsuggest|1|C:\Users\Admin\Desktop\ADD Claim ID\suggest.txt

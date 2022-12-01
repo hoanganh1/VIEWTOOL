@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using GPM_View.Controller;
+using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using System;
@@ -16,6 +17,9 @@ namespace GPM_View
     public partial class Form1 : Form
     {
         List<string> listComments = new List<string>();
+        List<string> listChannel = new List<string>();
+        List<string> listIDAndKey = new List<string>();
+        List<string> listKeywordForSuggest = new List<string>();
         public Form1()
         {
             InitializeComponent();
@@ -23,6 +27,7 @@ namespace GPM_View
         }
         List<account> lstAccount;
         List<string> lstProxy;
+       // List<string> Listcomments;
         int proxyNumber = 0;
         int numberRow = 0;
         Random random = new Random();
@@ -609,23 +614,232 @@ namespace GPM_View
         {
             if(flag_start == true)
             {
-                GPMLoginAPI api = new GPMLoginAPI("http://" + APP_URL.Text);
+                GPMLoginAPI api = new GPMLoginAPI("http://" + apiUrl.Text.Trim());
                 profiles = api.GetProfiles();
             }
             flag_start = false;
-            if (indexKichBan == 2)
-            {
-                kichban2();
-            }
-            else if(indexKichBan == 1)
-            {
-                kichban1();
-            }
-            else
-            {
-                kichban3();
-            }
+
+            KichbanMix();
         }
+
+
+        public void KichbanMix(int a=-1)
+        {
+            
+            int dem_kb1 = 0;
+            int index = 0;
+            if (a > -1)
+            {
+                index = a;
+            }else
+            {
+                index = numberRow;
+            }
+            
+            numberRow += 1;
+            if (index >= dataGrid.Rows.Count) // Nếu mà chạy đến cái cuối cùng rồi thì lặp lại kịch bản
+            {
+                numberRow = 0;
+                index = numberRow;
+                numberRow += 1;
+            }
+            account act = lstAccount[index]; // Lấy ra account
+            UndetectChromeDriver driver = null;
+            try
+            {
+                // Lấy thong tin profile
+                addStatus(index, "starting");
+                GPMLoginAPI api = new GPMLoginAPI("http://" + apiUrl.Text.Trim());
+                acton sts = new acton(act, api);
+                Thread.Sleep(1000);
+                JObject ojb = sts.getLst(act.email, profiles); // Lấy ra thông số của trình duyệt
+                string id_profile = "";
+                if (ojb == null)
+                {
+                    goto ketthuc;
+                }
+                else
+                {
+                    //đã có profile
+                    id_profile = ojb["id"].ToString();
+                }
+                Thread.Sleep(1000);
+                bool lockWasTaken = false;
+                var temp = obj;
+                try
+                {
+                    Monitor.Enter(temp, ref lockWasTaken);
+                    addStatus(index, "đang mở profile");
+                    try { driver = sts.openProfile(id_profile, index); } // Mở thông số lên
+                    catch
+                    {
+                        addStatus(index, "Lỗi mở profile");
+                        saveError(act, "Lỗi mở profile");
+                        goto ketthuc;
+                    }
+                }
+                finally
+                {
+                    if (lockWasTaken)
+                    {
+                        Monitor.Exit(temp);
+                    }
+                }
+                while (dem_kb1 < nbThread.Value - 1)
+                {
+                    dem_kb1++;
+                    Thread.Sleep(2000);
+                }
+                addStatus(index, "Kiểm tra đăng nhập");
+                Thread.Sleep(2000);
+                LoginAutomation login = new LoginAutomation(driver);
+                if(!login.Login(act.email, act.password,act.mail_kp))
+                {
+                    addStatus(index, "Lỗi Login!");
+                    driver.Close();
+                    driver.Dispose();
+                    driver.Quit();
+                    goto ketthuc;
+                }
+                Thread.Sleep(3000);
+                addStatus(index, "Try cập vào youtube");
+                driver.Get("https://www.youtube.com/");
+                Thread.Sleep(TimeSpan.FromSeconds(random.Next(3, 5)));
+
+                SearchAutomation search = new SearchAutomation(driver);
+                VideoAutomation video = new VideoAutomation(driver);
+                HomeAutomation home = new HomeAutomation(driver, listChannel);
+                SuggestAutomation suggest = new SuggestAutomation(driver);
+            searchAgain:
+                addStatus(index, "Khởi chạy Tìm kiếm lần đầu tuy cập");
+                int idexSearch = random.Next(0, listIDAndKey.Count);
+                string[] idandKey = listIDAndKey[idexSearch].ToString().Split(';');
+                if(!search.Run(0,idandKey[1],idandKey[0]))
+                {
+                    addStatus(index, "Thực hiện tìm kiếm lần nữa!");
+                    goto searchAgain;
+                }
+                addStatus(index, "Đã tìm thấy video!");
+                Thread.Sleep(3000);
+                addStatus(index, "Bắt đầu xem video!");
+                video._Comment = listComments[random.Next(0, listComments.Count)].ToString();
+                video._from = (int)numFrom.Value;
+                video._to = (int)numFrom.Value;
+                video._isLike = true;
+                video._isComment = true;
+                video._waitTimeEnd = (int)waitTimeEnd.Value;
+                video._waitTimeStart = (int)waitTimeStart.Value;
+                video.Run();
+                addStatus(index, "Đã xem xong video");
+                Thread.Sleep(3000);
+                while (true)
+                {
+                    int iView = random.Next(0, 3);
+                    switch(iView)
+                    {
+                        case 0:
+                            addStatus(index, "Đang chạy view trang chủ!");
+                            home.Run();
+                            break;
+                        case 1:
+                            int idexSearch1 = random.Next(0, listIDAndKey.Count);
+                            string[] idandKey1 = listIDAndKey[idexSearch].ToString().Split(';');
+                            addStatus(index, "Đang chạy view tìm kiếm!");
+                            search.Run(1, idandKey1[1], idandKey1[0]);
+                            break;
+                        case 2:
+                            addStatus(index, "Đang chạy view đề xuất");
+                            int idexSearch2 = random.Next(0, listIDAndKey.Count);
+                            string[] idandKey2 = listIDAndKey[idexSearch].ToString().Split(';');
+                            suggest.run(txtChannelName.Text.Trim(), txtChannelID.Text.Trim(), listKeywordForSuggest[random.Next(0, listKeywordForSuggest.Count)], idandKey2[0]);
+                            break;
+                        default:
+                            break;
+
+                    }
+                    Thread.Sleep(3000);
+                    addStatus(index, "Bắt đầu xem video!");
+                    video._Comment = listComments[random.Next(0, listComments.Count)].ToString();
+                    video._from = (int)numFrom.Value;
+                    video._to = (int)numFrom.Value;
+                    video._isLike = true;
+                    video._isComment = true;
+                    video.Run();
+                    addStatus(index, "Đã xem xong video");
+                    Thread.Sleep(2000);
+
+                    // randome View
+
+                }
+
+                addStatus(index, "Done!");
+                try
+                {
+                    driver.Close();
+                }
+                catch
+                {
+
+                }
+                try
+                {
+                    driver.Quit();
+                }
+                catch
+                {
+
+                }
+                try
+                {
+                    driver.Dispose();
+                }
+                catch
+                {
+
+                }
+            
+              
+                goto ketthuc;
+
+            }
+            catch
+            {
+                addStatus(index, "Ngoại lệ view");
+                try
+                {
+                    driver.Close();
+                }
+                catch
+                {
+
+                }
+                try
+                {
+                    driver.Quit();
+                }
+                catch
+                {
+
+                }
+                try
+                {
+                    driver.Dispose();
+                }
+                catch
+                {
+
+                }
+
+
+                goto ketthuc;
+            }
+        ketthuc:
+            KichbanMix(index);
+            return;
+        }
+
+
+
         private static readonly Object obj = new Object();
 
         private void kichban1()
@@ -649,29 +863,11 @@ namespace GPM_View
                 GPMLoginAPI api = new GPMLoginAPI("http://" + APP_URL.Text);
                 acton sts = new acton(act, api);
                 Thread.Sleep(1000);
-                JObject ojb = sts.getLst(act.email, profiles);
-                string id_profile = "";
+                JObject ojb = sts.getLst(act.email, profiles); // Lấy ra thông số của trình duyệt
+                string id_profile = ""; 
                 if (ojb == null)
                 {
-                    int prox = proxyNumber;
-                    loadProxy();
-                    proxyNumber += 1;
-                    if (prox >= lstProxy.Count)
-                    {
-                        proxyNumber = 0;
-                        prox = proxyNumber;
-                    }
-                    string proxy = lstProxy[prox];
-                    resave(proxy);
-
-                    ojb = api.Create(act.email, proxy, true);
-                    if (ojb != null)
-                    {
-                        //Tạo thành công
-                        id_profile = ojb["profile_id"].ToString();
-                        addStatus(index, "tạo profile thành công");
-                        saveProfile(act, proxy);
-                    }
+                   
                 }
                 else
                 {
@@ -686,7 +882,7 @@ namespace GPM_View
                 {
                     Monitor.Enter(temp, ref lockWasTaken);
                     addStatus(index, "đang mở profile");
-                    try { driver = sts.openProfile(id_profile, index); }
+                    try { driver = sts.openProfile(id_profile, index); } // Mở thông số lên
                     catch
                     {
                         addStatus(index, "Lỗi mở profile");
@@ -1041,7 +1237,8 @@ namespace GPM_View
             try
             {
                 addStatus(index, "starting");
-                GPMLoginAPI api = new GPMLoginAPI("http://" + APP_URL.Text);
+                Console.WriteLine(APP_URL.Text);
+                GPMLoginAPI api = new GPMLoginAPI("http://" + "127.0.0.1:19955");
                 acton sts = new acton(act, api);
                 
                 Thread.Sleep(1000);
@@ -1557,6 +1754,16 @@ namespace GPM_View
         }
         private void Form1_Load(object sender, EventArgs e)
         {
+            try
+            {
+
+                var lines = File.ReadAllLines("config\\config.txt");
+
+            }
+            catch
+            {
+                MessageBox.Show("Config file not found!");
+            }
         }
         void savep()
         {
@@ -1592,6 +1799,7 @@ namespace GPM_View
         private int iSoLuongDangChay;
         private string strKeyWork;
         private string strTenChannel;
+        private string strChannelID;
         private int iSoLanMoLink = 0;
 
 
@@ -1607,11 +1815,6 @@ namespace GPM_View
             }
         }
         
-
-        private void Form1_Load_1(object sender, EventArgs e)
-        {
-
-        }
 
         private void btnStop_Click_1(object sender, EventArgs e)
         {
@@ -1646,10 +1849,32 @@ namespace GPM_View
             checkopentab = !checkopentab;
         }
 
+
+
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
         // chay
         private void button2_Click_1(object sender, EventArgs e)
         {
-            
+
+            if (listIDAndKey.Count == 0 || lstAccount.Count == 0 || listComments.Count == 0 || listKeywordForSuggest.Count == 0 || txtChannelName.Text.Trim() == "" || txtChannelID.Text.Trim() == "" || apiUrl.Text.Trim() == "")
+            {
+                MessageBox.Show("Nhập đầy đủ thông tin");
+                return;
+            }
+
             iSoLuongDangChay = 0;
             iSoLuongEmail = dataGrid.Rows.Count;
 
@@ -1664,47 +1889,97 @@ namespace GPM_View
 
             iSoLuong = (int)nbThread.Value;
             strKeyWork = txtKeyword.Text.Trim();
-            strTenChannel = txtChannel.Text.Trim();
+            strTenChannel = txtChannelName.Text.Trim();
+            strChannelID = txtChannelID.Text.Trim();
+
+
             iSoLanMoLink = int.Parse(txtSoLanMoLink.Text);
 
-            if (flag_view_dx == true)
-            {   
-                Thread st = new Thread(() =>
-                {
-                    createThread(1);
-                });
-                st.IsBackground = true;
-                st.Start();
-                lsThread.Add(st);
-            }
-            else if(flag_view_pll == true)
+            Thread st = new Thread(() =>
             {
-                Thread st = new Thread(() =>
-                {
-                    createThread(2);
-                });
-                st.IsBackground = true;
-                st.Start();
-                lsThread.Add(st);
-            }
-            else if(flag_viewPll_video == true)
-            {
-                Thread st = new Thread(() =>
-                {
-                    createThread(3);
-                });
-                st.IsBackground = true;
-                st.Start();
-                lsThread.Add(st);
-            }
-            else
-            {
-                MessageBox.Show("Hãy Chọn Loại View");
+                createThread(1);
+            });
+            st.IsBackground = true;
+            st.Start();
+            lsThread.Add(st);
 
-            }
+            
         }
 
         private void sub_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+
+        }
+
+        private void OpenComment_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.ShowDialog();
+            if (ofd.FileName.Length > 0)
+            {
+               
+                listComments = File.ReadAllLines(ofd.FileName).ToList();
+                richComments.Lines = listComments.ToArray();
+
+                //int num = 0;
+                //foreach (var line in lines)
+                //{
+
+                //    Listcomments.Add(line);
+                //}
+            }
+           
+        }
+
+        private void btnIDandSearch_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.ShowDialog();
+            if (ofd.FileName.Length > 0)
+            {
+
+                listIDAndKey = File.ReadAllLines(ofd.FileName).ToList();
+                richIDAndSearch.Lines = listIDAndKey.ToArray();
+
+                //int num = 0;
+                //foreach (var line in lines)
+                //{
+
+                //    Listcomments.Add(line);
+                //}
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.ShowDialog();
+            if (ofd.FileName.Length > 0)
+            {
+
+                listKeywordForSuggest = File.ReadAllLines(ofd.FileName).ToList();
+                richKeySuggest.Lines = listKeywordForSuggest.ToArray();
+
+                //int num = 0;
+                //foreach (var line in lines)
+                //{
+
+                //    Listcomments.Add(line);
+                //}
+            }
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
         {
 
         }
