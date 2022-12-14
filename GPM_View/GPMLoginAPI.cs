@@ -30,6 +30,8 @@ namespace GPM_View
 
         /// <summary>
         /// Start a profile by ID
+        /// // Nếu mà browser cũ của nó chưa được đóng thì remote debug cũng nó sẽ sai
+        /// // vì nó sẽ chỉ nhận remote debug
         /// </summary>
         /// <param name="profileId"></param>
         /// <param name="remoteDebugPort"></param>

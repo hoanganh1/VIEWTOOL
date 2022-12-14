@@ -45,7 +45,14 @@ namespace GPM_View.Controller
             DriverHelper driverHelper = new DriverHelper(_driver);
             try
             {
-                _driver.Get("https://accounts.google.com/");
+                try
+                {
+                    _driver.Get("https://accounts.google.com/");
+                }
+                catch
+                {
+
+                }
                 viaDelay();
                 if (_driver.Url.Contains("myaccount."))
                 {
@@ -85,7 +92,6 @@ namespace GPM_View.Controller
                 Thread.Sleep(5000);
                 if (_driver.Url.Contains("mail.google.com"))
                 {
-                   // driverHelper.Quit();
                     return true;
                 }
 

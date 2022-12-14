@@ -35,11 +35,17 @@ namespace GPM_View
 
         public int _duration = 0;
 
-        public VideoAutomation(UndetectChromeDriver driver)
+        public int index { get; set; }
+
+        public delegate void CallbackEventHandler(int index, string status, int type);
+        public event CallbackEventHandler AddStatus;
+
+        public VideoAutomation(UndetectChromeDriver driver, int index)
         {
             this.driver = driver;
             this.action = new Actions(driver);
             js = (IJavaScriptExecutor)driver;
+            this.index = index;
 
         }
 
@@ -48,18 +54,35 @@ namespace GPM_View
         {
             try
             {
+                Thread.Sleep(5000);
+                // Nếu url không phải video thì return về luôn
+                if(!driver.Url.Contains("watch?v"))
+                {
+                    return;
+                }
+
                 bool done = false;
                 bool commentD = true;
-
-                Console.WriteLine("Pause/Start");
+                AddStatus(this.index, "Bỏ qua popup nếu có!", 0);
+                bypass_another_popup();
+                Thread.Sleep(2000);
+                AddStatus(this.index, "Bỏ qua Ads nếu có!!", 0);
+                if(!checkAdsRuning())
+                {
+                    skipAds();
+                }
+               
+                Thread.Sleep(2000);
+                AddStatus(this.index, "Play video nếu đang dừng", 0);
                 checkAndPlay();
                 Thread.Sleep(TimeSpan.FromSeconds(2));
-                Console.WriteLine("set Sound");
+                AddStatus(this.index, "Bật âm nếu âm tắt", 0);
                 isOnSound();
-                Console.WriteLine("GetTotal Time");
+                Thread.Sleep(1000);
+                AddStatus(this.index, "Lấy thời gian video!", 0);
                 List<int> tTime = totalTime();
                 Thread.Sleep(TimeSpan.FromSeconds(3));
-                Console.WriteLine("setQuality");
+                AddStatus(this.index, "Cài đặt chất lượng video!", 0);
                 setQuality();
                 Thread.Sleep(TimeSpan.FromSeconds(2));
                 int stopT = 0;
@@ -67,108 +90,124 @@ namespace GPM_View
                 {
                     stopT = stopStime(tTime[0], tTime[1]);
                 }
-                Console.WriteLine("Bắt Đầu Thực hiện hành vi bên trong video đang xem!");
 
-                while (true)
+                AddStatus(this.index, "Bắt đầu thực hiện tính toán ..!", 0);
+                string oldUrl = driver.Url;
+
+                bool isSet = true;
+                int realSleep = 0;
+                for(int i =0; i< (int)stopT/4; i ++)
                 {
-
-                    int ranSleep = ran.Next(_waitTimeStart, _waitTimeEnd);
-                    int current = getRealTime();
-                    int acceptTime = (tTime[0] - current);
-
-                    Console.WriteLine("Thời gian còn lại: " + acceptTime);
-                    Console.WriteLine("Thời gian dừng/nghỉ: " + ranSleep);
-                    if ((acceptTime - 120) < ranSleep || (current + ranSleep) > _duration) // Neeus thon gian ma nho hon thi call.
+                    Thread.Sleep(TimeSpan.FromSeconds(60));
+                    string currentUrl = driver.Url;
+                    if (!oldUrl.Equals(currentUrl))
                     {
-                        Console.WriteLine("Dừng cho đến hết video và không hành động gì: " + ranSleep);
-                        Thread.Sleep(TimeSpan.FromSeconds(acceptTime));
+                        Thread.Sleep(TimeSpan.FromSeconds(ran.Next(30, 60)));
                         return;
                     }
-                    Console.WriteLine("Bắt đầu chờ đợi.....!: " + ranSleep);
-                    // Thực hiện thời gian nghỉ chờ đợi
-                    for(int i = 0; i < (int)((ranSleep/4)); i ++ )
+
+                    if (isSet)
                     {
-                        Thread.Sleep(TimeSpan.FromSeconds(5));
-                        Console.WriteLine(driver.ExecuteScript("return document.getElementById('movie_player').getCurrentTime()"));
-                        
+                        int ranSleep = ran.Next(_waitTimeStart, _waitTimeEnd);
+                        realSleep = getRealTime() + ranSleep;
+                        isSet = false;
                     }
+
+                    if(getRealTime() >= stopT)
+                    {
+                        return;
+                    }
+
+                    int TimeRemaining = stopT - getRealTime();
+
+                    AddStatus(this.index, "Thời gian còn lại: " + TimeRemaining + " s", 0);
+
+                    if(getRealTime() >= realSleep)
+                    {
+                        isSet = true;
+
+                        int ccs = ran.Next(0, 5);
+                        switch (ccs)
+                        {
+                            case 0:
+
+                                if (_isLike)
+                                {
+                                    AddStatus(this.index, "Bắt đầu like video", 0);
+                                    likeVideo();
+                                    _isLike = false;
+                                }
+                                else
+                                {
+                                    int cs = ran.Next(0, 3);
+                                    if (cs == 0)
+                                    {
+                                        AddStatus(this.index, "Bắt đầu cuộn video", 0);
+                                        ScrollToScroll();
+                                    }
+                                    else if (cs == 1)
+                                    {
+                                        AddStatus(this.index, "Xem lướt video đề xuất", 0);
+                                        watchSuggestVideo();
+                                    }
+                                    else
+                                    {
+                                        AddStatus(this.index, "Tua về trước/sau video", 0);
+                                        UpAnDown();
+                                    }
+
+                                }
+                                break;
+                            case 1:
+                                if (_isComment)
+                                {
+                                    AddStatus(this.index, "Bắt đầu comment video", 0);
+                                    Comment(_Comment);
+                                    _isComment = false;
+                                }
+                                else
+                                {
+                                    int cs = ran.Next(0, 3);
+                                    if (cs == 0)
+                                    {
+                                        AddStatus(this.index, "Bắt đầu cuộn video", 0);
+                                        ScrollToScroll();
+                                    }
+                                    else if (cs == 1)
+                                    {
+                                        AddStatus(this.index, "Xem lướt video đề xuất", 0);
+                                        watchSuggestVideo();
+                                    }
+                                    else
+                                    {
+                                        AddStatus(this.index, "Tua về trước/sau video", 0);
+                                        UpAnDown();
+                                    }
+
+                                }
+                                break;
+                            case 2:
+                                AddStatus(this.index, "Bắt đầu cuộn video", 0);
+                                ScrollToScroll();
+                                break;
+                            case 3:
+                                AddStatus(this.index, "Xem lướt video đề xuất", 0);
+                                watchSuggestVideo();
+                                break;
+                            case 4:
+                                AddStatus(this.index, "Tua về trước/sau video", 0);
+                                UpAnDown(); break;
+                            default: break;
+                        }
+
+
+
+                    }
+                 
+
                    
 
-                    Console.WriteLine("Bắt đầu thực hiện hành động tương tác.....!: ");
-                    // Thực hiện random hành động khác nhau
-                    int ccs = ran.Next(0, 5);
-                    switch (ccs)
-                    {
-                        case 0:
-                           
-                            if (_isLike)
-                            {
-                                Console.WriteLine("Đăng thực hiện Like video!");
-                                likeVideo();
-                                _isLike = false;
-                            }
-                            else
-                            {
-                                int cs = ran.Next(0, 3);
-                                if (cs == 0)
-                                {
-                                    Console.WriteLine("Đăng thực hiện cuộn video");
-                                    ScrollToScroll();
-                                }
-                                else if (cs == 1)
-                                {
-                                    Console.WriteLine("Thực hiện xem video đề xuất");
-                                    watchSuggestVideo();
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Thực hiện bấm tua nhanh video hoặc chậm");
-                                    UpAnDown();
-                                }
-
-                            }
-                            break;
-                        case 1:
-                            if (_isComment)
-                            {
-                                Console.WriteLine("Thực hiện comment video!");
-                                Comment(_Comment);
-                                _isComment = false;
-                            }
-                            else
-                            {
-                                int cs = ran.Next(0, 3);
-                                if (cs == 0)
-                                {
-                                    Console.WriteLine("Đăng thực hiện cuộn video");
-                                    ScrollToScroll();
-                                }
-                                else if (cs == 1)
-                                {
-                                    Console.WriteLine("Thực hiện xem video đề xuất");
-                                    watchSuggestVideo();
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Thực hiện bấm tua nhanh video hoặc chậm");
-                                    UpAnDown();
-                                }
-
-                            }
-                            break;
-                        case 2:
-                            Console.WriteLine("Đăng thực hiện cuộn video");
-                            ScrollToScroll();
-                            break;
-                        case 3:
-                            Console.WriteLine("Thực hiện xem video đề xuất");
-                            watchSuggestVideo();
-                            break;
-                        case 4:
-                            Console.WriteLine("Thực hiện bấm tua nhanh video hoặc chậm");
-                            UpAnDown(); break;
-                        default: break;
-                    }
+                    
 
 
                 }
@@ -196,23 +235,22 @@ namespace GPM_View
             try
             {
                 var item = driver.FindElement(By.Id("movie_player"));
-                Actions act = new Actions(driver);
                 for (int i = 0; i < ran.Next(1, 5); i++)
                 {
                     if (leftOrRight == 0)
                     {
-                        act.MoveToElement(item).SendKeys(Keys.Left).Pause(TimeSpan.FromSeconds(ran.Next(1, 3))).Build().Perform();
+                        new Actions(driver).MoveToElement(item).SendKeys(Keys.Left).Pause(TimeSpan.FromSeconds(ran.Next(1, 3))).Build().Perform();
                     }
                     else
                     {
-                        act.MoveToElement(item).SendKeys(Keys.Left).Pause(TimeSpan.FromSeconds(ran.Next(1, 3))).Build().Perform();
+                        new Actions(driver).MoveToElement(item).SendKeys(Keys.Left).Pause(TimeSpan.FromSeconds(ran.Next(1, 3))).Build().Perform();
                     }
 
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("UpanDown() thất bại");
+                AddStatus(this.index, "UpanDown chưa thành công", 1);
                 Console.WriteLine(ex);
             }
         }
@@ -224,22 +262,20 @@ namespace GPM_View
         {
             try
             {
-                bool like = (bool)js.ExecuteScript(" var t = document.querySelector(\"#segmented-like-button > ytd-toggle-button-renderer > yt-button-shape > button\").getAttribute(\"aria-pressed\"); return t;");
+                bool like = Convert.ToBoolean(driver.ExecuteScript("var t = document.querySelector(\"#segmented-like-button > ytd-toggle-button-renderer > yt-button-shape > button\").getAttribute(\"aria-pressed\"); return t;"));
                 if (like)
                 { return; }
 
                 
                 var likeButton = driver.FindElement(By.Id("segmented-like-button"));
-                Console.WriteLine("ĐÃ tìm thấy nút like");
-                Actions act = new Actions(driver);
-                act.MoveToElement(likeButton).Pause(TimeSpan.FromSeconds(1)).Click().Build().Perform();
+                new Actions(driver).MoveToElement(likeButton).Pause(TimeSpan.FromSeconds(1)).MoveToElement(likeButton).Click().Build().Perform();
                 Thread.Sleep(1000);
                 js.ExecuteScript("window.scrollTo({ top: 0, behavior: 'smooth' })");
             }
             catch
             {
-               
-                Console.WriteLine("Like video thất bại");
+
+                AddStatus(this.index, "Like video chưa thành công!", 2);
               
             }
         }
@@ -257,7 +293,9 @@ namespace GPM_View
                 for (int i = 0; i < items.Count; i++)
                 {
                     if (end == i)
-                    { js.ExecuteScript("window.scrollTo({ top: 0, behavior: 'smooth' })"); return;
+                    {
+                        js.ExecuteScript("window.scrollTo({ top: 0, behavior: 'smooth' })");
+                        return;
                     }
                     Actions act = new Actions(driver);
                     act.ScrollByAmount(0, 50).Build().Perform();
@@ -266,9 +304,10 @@ namespace GPM_View
                 }
 
             }
-            catch
+            catch(Exception ex)
             {
-                Console.WriteLine("watchSuggestVideo() Thất bại");
+                AddStatus(this.index, "Xem lướt video đề xuất chưa thành công", 1);
+                Console.WriteLine(ex);
             }
         }
 
@@ -282,15 +321,14 @@ namespace GPM_View
             try
             {
 
-                int x = 100;
+                int x = 250;
                 for (int i = 1; i < 50; i++)
                 {
                     driver.ExecuteScript("window.scrollTo(100," + (x * i) + ")");
                     try
                     {
                         var cmt = driver.FindElement(By.XPath("//ytd-comment-simplebox-renderer//yt-formatted-string"));
-                        Actions act = new Actions(driver);
-                        act.MoveToElement(cmt).Click().Build().Perform();
+                        new Actions(driver).MoveToElement(cmt).Click().Build().Perform();
                      
                         break;
                     }
@@ -308,19 +346,26 @@ namespace GPM_View
             }
             catch
             {
-                Console.WriteLine("Comment video thất bại");
+                AddStatus(this.index, "Comment video chưa thành công!", 0);
             }
 
         }
 
         public void senComment(IWebElement Xpath, string daya)
         {
-            foreach (var item in daya)
+            try
             {
-                Actions actionss = new Actions(driver);
-                actionss.MoveToElement(Xpath).SendKeys(item + "").Build().Perform();
-                Thread.Sleep(50);
+                foreach (var item in daya)
+                {
+                    new Actions(driver).MoveToElement(Xpath).SendKeys(item + "").Build().Perform();
+                    Thread.Sleep(50);
+                }
             }
+            catch
+            {
+
+            }
+           
         }
 
         /// <summary>
@@ -341,14 +386,13 @@ namespace GPM_View
 
                 foreach (int i in arrScroll)
                 {
-                    Actions act = new Actions(driver);
-                    act.ScrollByAmount(0, i).Pause(TimeSpan.FromSeconds(ran.Next(1, 3))).Build().Perform();
+                    new Actions(driver).ScrollByAmount(0, i).Pause(TimeSpan.FromSeconds(ran.Next(1, 3))).Build().Perform();
                 }
                 Thread.Sleep(TimeSpan.FromSeconds(1));
                 foreach (int i in arrScroll)
                 {
-                    Actions act = new Actions(driver);
-                    act.ScrollByAmount(0, i * (-1)).Pause(TimeSpan.FromSeconds(ran.Next(1, 3))).Build().Perform();
+
+                    new Actions(driver).ScrollByAmount(0, i * (-1)).Pause(TimeSpan.FromSeconds(ran.Next(1, 3))).Build().Perform();
                 }
                 Thread.Sleep(TimeSpan.FromSeconds(1));
 
@@ -356,7 +400,7 @@ namespace GPM_View
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ScrollToScroll() thất bại");
+                AddStatus(this.index, "Scroll xem video chưa thành công!", 1);
                 Console.WriteLine(ex);
             }
         }
@@ -438,13 +482,13 @@ namespace GPM_View
                   
                 if(_duration == 0)
                 {
-                    Console.WriteLine("Lấy Duration thất bại!");
+                    AddStatus(this.index, "Get Durration thất bại", 1);
                 }
               
                 Thread.Sleep(1000);
                 if (current > (int)(_duration / 3))
                 {
-                    int c = ran.Next(0, 10);
+                    int c = ran.Next(0, 20);
                     js.ExecuteScript("document.getElementById(\"movie_player\").seekTo(" + c + ",true);");
                     current = c;
                 }
@@ -453,7 +497,7 @@ namespace GPM_View
             }
             catch
             {
-                Console.WriteLine("totalTime() Lấy không thành công!");
+                AddStatus(this.index, "Get Durration thất bại", 1);
 
             }
 
@@ -507,28 +551,48 @@ namespace GPM_View
         {
             try
             {
-                Thread.Sleep(2000);
-                js.ExecuteScript("document.getElementsByClassName(\"ytp-button ytp-settings-button\")[0].click();");
-                Thread.Sleep(2000);
-                js.ExecuteScript("document.getElementsByClassName(\"ytp-panel-menu\")[0].lastChild.click()");
-                Thread.Sleep(2000);
-                var count = js.ExecuteScript("return document.getElementsByClassName(\"ytp-panel-menu\")[0].childNodes.length;");
-                Console.WriteLine(count);
-                int indx = (Convert.ToInt32(count) - 1) - ran.Next(1, 4);
-                if(indx < 0)
+                var quality = driver.ExecuteScript("return document.getElementsByClassName(\"ytp-button ytp-settings-button\").length;");
+                int num = Convert.ToInt32(quality);
+                int index = -1;
+                for (int i = 0; i < num; i++)
                 {
-                    indx = Convert.ToInt32(count)-(1 + 1);
+
+                    Thread.Sleep(1000);
+                    string isQua = (string)driver.ExecuteScript("return document.getElementsByClassName(\"ytp-button ytp-settings-button\")[" + i + "].style.display");
+                    if (isQua.Trim() == "")
+                    {
+                        index = i;
+                        break;
+                    }
+
+                }
+                if (index == -1)
+                {
+                    throw new Exception();
+                }
+
+                driver.ExecuteScript("document.getElementsByClassName(\"ytp-button ytp-settings-button\")[" + index + "].click();");
+                Thread.Sleep(2000);
+                driver.ExecuteScript("document.getElementsByClassName(\"ytp-panel-menu\")[" + index + "].lastChild.click()");
+                Thread.Sleep(2000);
+                var count = driver.ExecuteScript("return document.getElementsByClassName(\"ytp-panel-menu\")[" + index + "].childNodes.length;");
+                Console.WriteLine(count);
+                int indx = (Convert.ToInt32(count) - 1) - ran.Next(1,4);
+                if (indx < 0)
+                {
+                    indx = Convert.ToInt32(count) - (1 + 1);
                 }
                 var item = driver.FindElements(By.ClassName("ytp-menuitem"));
-                Actions act = new Actions(driver);
+                driver.ExecuteScript("arguments[0].scrollIntoViewIfNeeded();", item[indx]);
                 Thread.Sleep(1000);
-                act.MoveToElement(item[indx]).Click().Build().Perform();
+                driver.ExecuteScript("arguments[0].click()", item[indx]);
+
             }
             catch
             {
                 try
                 {
-                    Console.WriteLine("SetQuality thủ công không thành công");
+                    AddStatus(this.index, "Set Quality thủ công thất bại!", 1);
                     Thread.Sleep(2000);
                     js.ExecuteScript("document.getElementsByClassName(\"ytp-button ytp-settings-button\")[0].click();");
                     Thread.Sleep(2000);
@@ -537,7 +601,7 @@ namespace GPM_View
                 }
                 catch
                 {
-                    Console.WriteLine("SetQuality tự động không thành công");
+                    AddStatus(this.index, "Set Quality tự động thất bại!", 1);
                 }
 
             }
@@ -573,7 +637,7 @@ namespace GPM_View
             }
             catch
             {
-                Console.WriteLine("isSound() thất bại");
+                AddStatus(this.index, "Set sound thất bại", 1);
             }
 
 
@@ -597,12 +661,55 @@ namespace GPM_View
                 }
                 catch
                 {
-                    Console.WriteLine("getRealTime() Thất bại lần "+i);
+                    AddStatus(this.index, "Get Current time thất bại", 1);
                 }
             }
            
 
             return 0;
+        }
+
+        /// <summary>
+        ///  Click bỏ qua quảng cáo
+        /// </summary>
+        public void skipAds()
+        {
+            try
+            {
+                driver.ExecuteScript("var btn=document.createElement('newbutton');" + "document.body.appendChild(btn);");
+                string command = "setInterval(function(){" +
+                                   " if(document.getElementsByClassName(\"ytp-ad-text ytp-ad-skip-button-text\")[0]!==undefined){ " +
+                                    " let skipBtn=document.getElementsByClassName(\"ytp-ad-text ytp-ad-skip-button-text\")[0];" +
+                                    "skipBtn.click(); }" +
+                                    "},5000);";
+                js.ExecuteScript(command);
+            }
+            catch
+            {
+
+            }
+           
+        }
+
+        /// <summary>
+        /// Kiểm tra xem bỏ qua ads đã được chạy hay chưa
+        /// </summary>
+        /// <returns></returns>
+        public bool checkAdsRuning()
+        {
+            try
+            {
+                int count = Convert.ToInt32(driver.ExecuteScript("return document.getElementsByTagName(\"newbutton\").length"));
+                if (count != 0)
+                {
+                    return true ;
+                }
+            }
+            catch
+            {
+
+            }
+            return false;
         }
 
 
@@ -614,17 +721,23 @@ namespace GPM_View
         {
             try
             {
-                int start = getRealTime();
-                Thread.Sleep(TimeSpan.FromSeconds(5));
-                int end = getRealTime();
-                if (start == end)
+                for(int i = 0; i < 20; i ++)
                 {
-                    js.ExecuteScript("document.getElementsByClassName(\"ytp-play-button ytp-button\")[0].click()");
+                    int state = Convert.ToInt32( js.ExecuteScript("return document.getElementById('movie_player').getPlayerState()"));
+                    if(state == 5)
+                    {
+                        Thread.Sleep(5000);
+                    }else if(state == 2)
+                    {
+                        js.ExecuteScript("document.getElementsByClassName(\"ytp-play-button ytp-button\")[0].click()");
+                        return;
+                    }
                 }
+              
             }
             catch
             {
-                Console.Write("CheckAndPlay thất bại!");
+                AddStatus(this.index, "Play and check thất bại",1);
             }
 
 

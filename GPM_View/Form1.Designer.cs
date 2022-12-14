@@ -33,13 +33,18 @@ namespace GPM_View
         {
             this.dataGrid = new System.Windows.Forms.DataGridView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.checkBox9 = new System.Windows.Forms.CheckBox();
+            this.waitTimeEnd = new System.Windows.Forms.NumericUpDown();
+            this.label20 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
+            this.apiUrl = new System.Windows.Forms.TextBox();
+            this.waitTimeStart = new System.Windows.Forms.NumericUpDown();
+            this.ckbRepeat = new System.Windows.Forms.CheckBox();
             this.button2 = new System.Windows.Forms.Button();
             this.checkBox10 = new System.Windows.Forms.CheckBox();
             this.btnStop = new System.Windows.Forms.Button();
-            this.checkBox8 = new System.Windows.Forms.CheckBox();
-            this.checkBox7 = new System.Windows.Forms.CheckBox();
-            this.checkBox6 = new System.Windows.Forms.CheckBox();
+            this.ckbSuggest = new System.Windows.Forms.CheckBox();
+            this.ckbHome = new System.Windows.Forms.CheckBox();
+            this.ckbSearch = new System.Windows.Forms.CheckBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.label10 = new System.Windows.Forms.Label();
             this.numericUpDown4 = new System.Windows.Forms.NumericUpDown();
@@ -82,7 +87,11 @@ namespace GPM_View
             this.panel4 = new System.Windows.Forms.Panel();
             this.label11 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.numRun = new System.Windows.Forms.NumericUpDown();
+            this.label19 = new System.Windows.Forms.Label();
+            this.txtChannelID = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.txtChannelName = new System.Windows.Forms.TextBox();
+            this.numForStart = new System.Windows.Forms.NumericUpDown();
             this.label17 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.numTo = new System.Windows.Forms.NumericUpDown();
@@ -97,28 +106,21 @@ namespace GPM_View
             this.checkBox12 = new System.Windows.Forms.CheckBox();
             this.checkBox11 = new System.Windows.Forms.CheckBox();
             this.label13 = new System.Windows.Forms.Label();
-            this.txtChannelName = new System.Windows.Forms.TextBox();
-            this.label18 = new System.Windows.Forms.Label();
-            this.label19 = new System.Windows.Forms.Label();
-            this.txtChannelID = new System.Windows.Forms.TextBox();
-            this.apiUrl = new System.Windows.Forms.TextBox();
-            this.label20 = new System.Windows.Forms.Label();
-            this.waitTimeEnd = new System.Windows.Forms.NumericUpDown();
-            this.label21 = new System.Windows.Forms.Label();
-            this.waitTimeStart = new System.Windows.Forms.NumericUpDown();
+            this.numForEnd = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).BeginInit();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.waitTimeEnd)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.waitTimeStart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nbThread)).BeginInit();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numRun)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numForStart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numTo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numFrom)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.waitTimeEnd)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.waitTimeStart)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numForEnd)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGrid
@@ -139,13 +141,13 @@ namespace GPM_View
             this.groupBox1.Controls.Add(this.label21);
             this.groupBox1.Controls.Add(this.apiUrl);
             this.groupBox1.Controls.Add(this.waitTimeStart);
-            this.groupBox1.Controls.Add(this.checkBox9);
+            this.groupBox1.Controls.Add(this.ckbRepeat);
             this.groupBox1.Controls.Add(this.button2);
             this.groupBox1.Controls.Add(this.checkBox10);
             this.groupBox1.Controls.Add(this.btnStop);
-            this.groupBox1.Controls.Add(this.checkBox8);
-            this.groupBox1.Controls.Add(this.checkBox7);
-            this.groupBox1.Controls.Add(this.checkBox6);
+            this.groupBox1.Controls.Add(this.ckbSuggest);
+            this.groupBox1.Controls.Add(this.ckbHome);
+            this.groupBox1.Controls.Add(this.ckbSearch);
             this.groupBox1.Controls.Add(this.panel3);
             this.groupBox1.Controls.Add(this.label10);
             this.groupBox1.Controls.Add(this.numericUpDown4);
@@ -182,15 +184,79 @@ namespace GPM_View
             this.groupBox1.Text = "SETUP";
             this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
             // 
-            // checkBox9
+            // waitTimeEnd
             // 
-            this.checkBox9.AutoSize = true;
-            this.checkBox9.Location = new System.Drawing.Point(311, 517);
-            this.checkBox9.Name = "checkBox9";
-            this.checkBox9.Size = new System.Drawing.Size(63, 19);
-            this.checkBox9.TabIndex = 49;
-            this.checkBox9.Text = "Repeat";
-            this.checkBox9.UseVisualStyleBackColor = true;
+            this.waitTimeEnd.Location = new System.Drawing.Point(379, 427);
+            this.waitTimeEnd.Maximum = new decimal(new int[] {
+            3000,
+            0,
+            0,
+            0});
+            this.waitTimeEnd.Name = "waitTimeEnd";
+            this.waitTimeEnd.Size = new System.Drawing.Size(59, 22);
+            this.waitTimeEnd.TabIndex = 66;
+            this.waitTimeEnd.Value = new decimal(new int[] {
+            900,
+            0,
+            0,
+            0});
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("Times New Roman", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label20.Location = new System.Drawing.Point(239, 563);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(60, 15);
+            this.label20.TabIndex = 64;
+            this.label20.Text = "API URL:";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Font = new System.Drawing.Font("Times New Roman", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label21.Location = new System.Drawing.Point(225, 429);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(74, 15);
+            this.label21.TabIndex = 65;
+            this.label21.Text = "wait time(s):";
+            // 
+            // apiUrl
+            // 
+            this.apiUrl.Location = new System.Drawing.Point(305, 560);
+            this.apiUrl.Name = "apiUrl";
+            this.apiUrl.Size = new System.Drawing.Size(129, 22);
+            this.apiUrl.TabIndex = 64;
+            this.apiUrl.Text = "127.0.0.1:19995";
+            // 
+            // waitTimeStart
+            // 
+            this.waitTimeStart.Location = new System.Drawing.Point(305, 427);
+            this.waitTimeStart.Maximum = new decimal(new int[] {
+            3000,
+            0,
+            0,
+            0});
+            this.waitTimeStart.Name = "waitTimeStart";
+            this.waitTimeStart.Size = new System.Drawing.Size(68, 22);
+            this.waitTimeStart.TabIndex = 64;
+            this.waitTimeStart.Value = new decimal(new int[] {
+            300,
+            0,
+            0,
+            0});
+            // 
+            // ckbRepeat
+            // 
+            this.ckbRepeat.AutoSize = true;
+            this.ckbRepeat.Checked = true;
+            this.ckbRepeat.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ckbRepeat.Location = new System.Drawing.Point(311, 517);
+            this.ckbRepeat.Name = "ckbRepeat";
+            this.ckbRepeat.Size = new System.Drawing.Size(63, 19);
+            this.ckbRepeat.TabIndex = 49;
+            this.ckbRepeat.Text = "Repeat";
+            this.ckbRepeat.UseVisualStyleBackColor = true;
             // 
             // button2
             // 
@@ -227,41 +293,41 @@ namespace GPM_View
             this.btnStop.UseVisualStyleBackColor = false;
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click_1);
             // 
-            // checkBox8
+            // ckbSuggest
             // 
-            this.checkBox8.AutoSize = true;
-            this.checkBox8.Checked = true;
-            this.checkBox8.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox8.Location = new System.Drawing.Point(311, 485);
-            this.checkBox8.Name = "checkBox8";
-            this.checkBox8.Size = new System.Drawing.Size(103, 19);
-            this.checkBox8.TabIndex = 46;
-            this.checkBox8.Text = "Suggest views";
-            this.checkBox8.UseVisualStyleBackColor = true;
+            this.ckbSuggest.AutoSize = true;
+            this.ckbSuggest.Checked = true;
+            this.ckbSuggest.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ckbSuggest.Location = new System.Drawing.Point(311, 485);
+            this.ckbSuggest.Name = "ckbSuggest";
+            this.ckbSuggest.Size = new System.Drawing.Size(103, 19);
+            this.ckbSuggest.TabIndex = 46;
+            this.ckbSuggest.Text = "Suggest views";
+            this.ckbSuggest.UseVisualStyleBackColor = true;
             // 
-            // checkBox7
+            // ckbHome
             // 
-            this.checkBox7.AutoSize = true;
-            this.checkBox7.Checked = true;
-            this.checkBox7.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox7.Location = new System.Drawing.Point(173, 516);
-            this.checkBox7.Name = "checkBox7";
-            this.checkBox7.Size = new System.Drawing.Size(89, 19);
-            this.checkBox7.TabIndex = 45;
-            this.checkBox7.Text = "Home views";
-            this.checkBox7.UseVisualStyleBackColor = true;
+            this.ckbHome.AutoSize = true;
+            this.ckbHome.Checked = true;
+            this.ckbHome.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ckbHome.Location = new System.Drawing.Point(173, 516);
+            this.ckbHome.Name = "ckbHome";
+            this.ckbHome.Size = new System.Drawing.Size(89, 19);
+            this.ckbHome.TabIndex = 45;
+            this.ckbHome.Text = "Home views";
+            this.ckbHome.UseVisualStyleBackColor = true;
             // 
-            // checkBox6
+            // ckbSearch
             // 
-            this.checkBox6.AutoSize = true;
-            this.checkBox6.Checked = true;
-            this.checkBox6.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox6.Location = new System.Drawing.Point(173, 485);
-            this.checkBox6.Name = "checkBox6";
-            this.checkBox6.Size = new System.Drawing.Size(97, 19);
-            this.checkBox6.TabIndex = 44;
-            this.checkBox6.Text = "Search views";
-            this.checkBox6.UseVisualStyleBackColor = true;
+            this.ckbSearch.AutoSize = true;
+            this.ckbSearch.Checked = true;
+            this.ckbSearch.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ckbSearch.Location = new System.Drawing.Point(173, 485);
+            this.ckbSearch.Name = "ckbSearch";
+            this.ckbSearch.Size = new System.Drawing.Size(97, 19);
+            this.ckbSearch.TabIndex = 44;
+            this.ckbSearch.Text = "Search views";
+            this.ckbSearch.UseVisualStyleBackColor = true;
             // 
             // panel3
             // 
@@ -398,6 +464,8 @@ namespace GPM_View
             // checkBox3
             // 
             this.checkBox3.AutoSize = true;
+            this.checkBox3.Checked = true;
+            this.checkBox3.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox3.Location = new System.Drawing.Point(12, 485);
             this.checkBox3.Name = "checkBox3";
             this.checkBox3.Size = new System.Drawing.Size(104, 19);
@@ -684,11 +752,12 @@ namespace GPM_View
             // groupBox2
             // 
             this.groupBox2.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.groupBox2.Controls.Add(this.numForEnd);
             this.groupBox2.Controls.Add(this.label19);
             this.groupBox2.Controls.Add(this.txtChannelID);
             this.groupBox2.Controls.Add(this.label18);
             this.groupBox2.Controls.Add(this.txtChannelName);
-            this.groupBox2.Controls.Add(this.numRun);
+            this.groupBox2.Controls.Add(this.numForStart);
             this.groupBox2.Controls.Add(this.label17);
             this.groupBox2.Controls.Add(this.label16);
             this.groupBox2.Controls.Add(this.numTo);
@@ -712,14 +781,50 @@ namespace GPM_View
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "VIEWS DETAIL";
             // 
-            // numRun
+            // label19
             // 
-            this.numRun.Location = new System.Drawing.Point(124, 74);
-            this.numRun.Name = "numRun";
-            this.numRun.Size = new System.Drawing.Size(117, 22);
-            this.numRun.TabIndex = 60;
-            this.numRun.Value = new decimal(new int[] {
-            3,
+            this.label19.AutoSize = true;
+            this.label19.Font = new System.Drawing.Font("Times New Roman", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.Location = new System.Drawing.Point(444, 77);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(73, 15);
+            this.label19.TabIndex = 63;
+            this.label19.Text = "Channel ID:";
+            // 
+            // txtChannelID
+            // 
+            this.txtChannelID.Location = new System.Drawing.Point(541, 74);
+            this.txtChannelID.Name = "txtChannelID";
+            this.txtChannelID.Size = new System.Drawing.Size(129, 22);
+            this.txtChannelID.TabIndex = 62;
+            this.txtChannelID.Text = "jack-slives9930";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Font = new System.Drawing.Font("Times New Roman", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label18.Location = new System.Drawing.Point(445, 50);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(91, 15);
+            this.label18.TabIndex = 61;
+            this.label18.Text = "Channel Name:";
+            // 
+            // txtChannelName
+            // 
+            this.txtChannelName.Location = new System.Drawing.Point(542, 47);
+            this.txtChannelName.Name = "txtChannelName";
+            this.txtChannelName.Size = new System.Drawing.Size(129, 22);
+            this.txtChannelName.TabIndex = 50;
+            this.txtChannelName.Text = "JACK-s LIVES";
+            // 
+            // numForStart
+            // 
+            this.numForStart.Location = new System.Drawing.Point(124, 74);
+            this.numForStart.Name = "numForStart";
+            this.numForStart.Size = new System.Drawing.Size(117, 22);
+            this.numForStart.TabIndex = 60;
+            this.numForStart.Value = new decimal(new int[] {
+            6,
             0,
             0,
             0});
@@ -879,100 +984,14 @@ namespace GPM_View
             this.label13.TabIndex = 49;
             this.label13.Text = "PROCESSES:";
             // 
-            // txtChannelName
+            // numForEnd
             // 
-            this.txtChannelName.Location = new System.Drawing.Point(542, 47);
-            this.txtChannelName.Name = "txtChannelName";
-            this.txtChannelName.Size = new System.Drawing.Size(129, 22);
-            this.txtChannelName.TabIndex = 50;
-            this.txtChannelName.Text = "JACK-s LIVES";
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Font = new System.Drawing.Font("Times New Roman", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label18.Location = new System.Drawing.Point(445, 50);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(91, 15);
-            this.label18.TabIndex = 61;
-            this.label18.Text = "Channel Name:";
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Font = new System.Drawing.Font("Times New Roman", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label19.Location = new System.Drawing.Point(444, 77);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(73, 15);
-            this.label19.TabIndex = 63;
-            this.label19.Text = "Channel ID:";
-            // 
-            // txtChannelID
-            // 
-            this.txtChannelID.Location = new System.Drawing.Point(541, 74);
-            this.txtChannelID.Name = "txtChannelID";
-            this.txtChannelID.Size = new System.Drawing.Size(129, 22);
-            this.txtChannelID.TabIndex = 62;
-            this.txtChannelID.Text = "jack-slives9930";
-            // 
-            // apiUrl
-            // 
-            this.apiUrl.Location = new System.Drawing.Point(305, 560);
-            this.apiUrl.Name = "apiUrl";
-            this.apiUrl.Size = new System.Drawing.Size(129, 22);
-            this.apiUrl.TabIndex = 64;
-            this.apiUrl.Text = "127.0.0.1:19995";
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Font = new System.Drawing.Font("Times New Roman", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label20.Location = new System.Drawing.Point(239, 563);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(60, 15);
-            this.label20.TabIndex = 64;
-            this.label20.Text = "API URL:";
-            // 
-            // waitTimeEnd
-            // 
-            this.waitTimeEnd.Location = new System.Drawing.Point(379, 427);
-            this.waitTimeEnd.Maximum = new decimal(new int[] {
-            3000,
-            0,
-            0,
-            0});
-            this.waitTimeEnd.Name = "waitTimeEnd";
-            this.waitTimeEnd.Size = new System.Drawing.Size(59, 22);
-            this.waitTimeEnd.TabIndex = 66;
-            this.waitTimeEnd.Value = new decimal(new int[] {
-            900,
-            0,
-            0,
-            0});
-            // 
-            // label21
-            // 
-            this.label21.AutoSize = true;
-            this.label21.Font = new System.Drawing.Font("Times New Roman", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label21.Location = new System.Drawing.Point(225, 429);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(74, 15);
-            this.label21.TabIndex = 65;
-            this.label21.Text = "wait time(s):";
-            // 
-            // waitTimeStart
-            // 
-            this.waitTimeStart.Location = new System.Drawing.Point(305, 427);
-            this.waitTimeStart.Maximum = new decimal(new int[] {
-            3000,
-            0,
-            0,
-            0});
-            this.waitTimeStart.Name = "waitTimeStart";
-            this.waitTimeStart.Size = new System.Drawing.Size(68, 22);
-            this.waitTimeStart.TabIndex = 64;
-            this.waitTimeStart.Value = new decimal(new int[] {
-            300,
+            this.numForEnd.Location = new System.Drawing.Point(272, 74);
+            this.numForEnd.Name = "numForEnd";
+            this.numForEnd.Size = new System.Drawing.Size(117, 22);
+            this.numForEnd.TabIndex = 64;
+            this.numForEnd.Value = new decimal(new int[] {
+            10,
             0,
             0,
             0});
@@ -1008,6 +1027,8 @@ namespace GPM_View
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.waitTimeEnd)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.waitTimeStart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
@@ -1015,11 +1036,10 @@ namespace GPM_View
             ((System.ComponentModel.ISupportInitialize)(this.nbThread)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numRun)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numForStart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numTo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numFrom)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.waitTimeEnd)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.waitTimeStart)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numForEnd)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1067,9 +1087,9 @@ namespace GPM_View
         private NumericUpDown numericUpDown1;
         private CheckBox checkBox1;
         private CheckBox checkBox10;
-        private CheckBox checkBox8;
-        private CheckBox checkBox7;
-        private CheckBox checkBox6;
+        private CheckBox ckbSuggest;
+        private CheckBox ckbHome;
+        private CheckBox ckbSearch;
         private Panel panel3;
         private Label label10;
         private NumericUpDown numericUpDown4;
@@ -1086,8 +1106,8 @@ namespace GPM_View
         private CheckBox checkBox11;
         private Label label13;
         private Button button5;
-        private CheckBox checkBox9;
-        private NumericUpDown numRun;
+        private CheckBox ckbRepeat;
+        private NumericUpDown numForStart;
         private Label label17;
         private Label label16;
         private NumericUpDown numTo;
@@ -1104,6 +1124,7 @@ namespace GPM_View
         private NumericUpDown waitTimeEnd;
         private Label label21;
         private NumericUpDown waitTimeStart;
+        private NumericUpDown numForEnd;
     }
 }
 

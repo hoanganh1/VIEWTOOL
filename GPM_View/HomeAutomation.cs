@@ -18,37 +18,54 @@ namespace GPM_View
 
         public Actions action { get; set; }
 
-        public HomeAutomation(UndetectChromeDriver driver, List<string> channels)
+        public int index { get; set; }
+
+        public delegate void CallbackEventHandler(int index, string status, int type);
+        public event CallbackEventHandler AddStatus;
+
+        public HomeAutomation(UndetectChromeDriver driver, List<string> channels, int index)
         {
             this.driver = driver;
             this.action = new Actions(driver);
             this.channelList = channels;
+            this.index = index;
         }
 
         public void Run()
         {
             // Kiểm tra xem video đang xem có phải nằm trong danh sách channel của bạn không
             // Nếu không thì thực hiện tìm đến channel đó và kiểm tra xem đã đăng kí video hay chưa.
+            AddStatus(this.index, "Is your channel", 0);
+            if (!driver.Url.Contains("watch?v"))
+            {
+                AddStatus(this.index, "Vào kênh chuẩn bị cho subscriber!", 0);
+                driver.Navigate().GoToUrl("https://www.youtube.com/@" + channelList[ran.Next(0, channelList.Count)]);
+                Thread.Sleep(TimeSpan.FromSeconds(3));
+            }
+
             bool isYour = isYourChannel(channelList);
 
             if (!isYour)
             {
+                AddStatus(this.index, "Vào kênh chuẩn bị cho subscriber!", 0);
                 driver.Navigate().GoToUrl("https://www.youtube.com/@" + channelList[ran.Next(0, channelList.Count)]);
                 Thread.Sleep(TimeSpan.FromSeconds(3));
             }
-            // Kiểm tra xem đã đăng kí hay chưa, nếu chưa thì thực hiện đăng kí
+            AddStatus(this.index, "Kiểm tra đăng kí!", 0);
             CheckAndSubscriber();
-            Thread.Sleep(2000);
-            int c = ran.Next(0, 2);
-            bool RnC = c == 0 ? SubscriberProcess() : HomeProcess();
-            if ((RnC == false))
-            {
-                if (c == 1)
-                {
-                    SubscriberProcess();
-                }
 
-            }
+            Thread.Sleep(2000);
+            HomeProcess();
+            //int c = ran.Next(0, 2);
+            //bool RnC = c == 0 ? SubscriberProcess() : HomeProcess();
+            //if ((RnC == false))
+            //{
+            //    if (c == 1)
+            //    {
+            //        SubscriberProcess();
+            //    }
+
+            //}
 
 
 
@@ -64,9 +81,9 @@ namespace GPM_View
         {
             try
             {
-                // Click vào nút home để quay lại màn hình chính
+                AddStatus(this.index, "Bắt đầu tìm video mục subscriber", 0);
                 var itemsHome = driver.FindElement(By.XPath("//ytd-topbar-logo-renderer//yt-icon"));
-                action.MoveToElement(itemsHome).Click().Build().Perform();
+                new Actions(driver).MoveToElement(itemsHome).Click().Build().Perform();
                 Thread.Sleep(TimeSpan.FromSeconds(ran.Next(2, 5)));
 
                 // Click vào nút đăng ký
@@ -76,15 +93,16 @@ namespace GPM_View
                     var channel = item.GetAttribute("href");
                     if (channel != null)
                     {
-                        if (channel.Contains("subscriptions"))
+                        if (channel.Contains("subscriptions")) // Tìm thấy nút đăng kí thì thực hiện đăng kí
                         {
                             Console.WriteLine(channel);
-                            action.MoveToElement(item).Pause(TimeSpan.FromSeconds(1)).Click().Build().Perform();
+                            new Actions(driver).MoveToElement(item).Pause(TimeSpan.FromSeconds(1)).Click().Build().Perform();
+                            break;
                         }
                     }
 
                 }
-
+                AddStatus(this.index, "Chọn chế độ xem", 0);
                 Thread.Sleep(TimeSpan.FromSeconds(ran.Next(2, 5)));
                 /// Chọn chế độ xem video
                 // flow = 1 là xem dạng danh sách
@@ -100,19 +118,19 @@ namespace GPM_View
                     if (title.Contains(typeS))
                     {
                         foundFlow = true;
-                        action.MoveToElement(i).Click().Build().Perform();
-                        Thread.Sleep(3000);
+                        new Actions(driver).MoveToElement(i).Click().Build().Perform();
                         break;
                     }
 
                 }
+                Thread.Sleep(3000);
                 // Nếu trong trường hợp mà không thì thấy video thì thực hiện làm gì đó.
                 if (!foundFlow)
                 {
                     driver.Navigate().GoToUrl("https://www.youtube.com/feed/" + typeS);
                 }
 
-                // Tìm kiếm ngẫu nhiên video dạng grid
+                AddStatus(this.index, "Tìm kiếm video ngẫu nhiên để xem", 0);
                 if (oneOrTwo == 0)
                 {
                     var gridVideo = driver.FindElements(By.XPath("//ytd-grid-renderer//ytd-grid-video-renderer//ytd-thumbnail"));
@@ -123,13 +141,12 @@ namespace GPM_View
                         if (i == chooseVideo)
                         {
                             Console.WriteLine("vào video");
-                            action.MoveToElement(gridVideo[i]).Pause(TimeSpan.FromSeconds(2)).ScrollByAmount(0, 100).Pause(TimeSpan.FromSeconds(2)).MoveToElement(gridVideo[i]).Click().Build().Perform();
+                            new Actions(driver).MoveToElement(gridVideo[i]).Pause(TimeSpan.FromSeconds(2)).ScrollByAmount(0, 100).Pause(TimeSpan.FromSeconds(2)).MoveToElement(gridVideo[i]).Click().Build().Perform();
                             return true;
-                            break;
                         }
                         else
                         {
-                            action.ScrollByAmount(0, ran.Next(20, 50)).Build().Perform();
+                            new Actions(driver).ScrollByAmount(0, ran.Next(20, 50)).Build().Perform();
                         }
                     }
 
@@ -144,25 +161,21 @@ namespace GPM_View
                     {
                         if (i == chooseVideo)
                         {
-                            action.MoveToElement(items1[i]).Pause(TimeSpan.FromSeconds(2)).ScrollByAmount(0, 100).Pause(TimeSpan.FromSeconds(2)).MoveToElement(items1[i]).Click().Build().Perform();
+                            new Actions(driver).MoveToElement(items1[i]).Pause(TimeSpan.FromSeconds(2)).ScrollByAmount(0, 100).Pause(TimeSpan.FromSeconds(2)).MoveToElement(items1[i]).Click().Build().Perform();
                             return true;
-                            break;
                         }
                         else
                         {
-                            action.ScrollByAmount(0, ran.Next(50, 200)).Build().Perform();
+                            new Actions(driver).ScrollByAmount(0, ran.Next(50, 200)).Build().Perform();
                         }
                     }
 
                 }
 
-
-
-
             }
             catch
             {
-
+                AddStatus(this.index, "Xem video subscriber lỗi!", 2);
             }
             return false;
         }
@@ -179,19 +192,20 @@ namespace GPM_View
             {
                 bool stop = false;
             findAgain:
+                // Bấm vào trang chủ sau đó đợi để xem trong trang chủ có hiện video của mình không
+                AddStatus(this.index, "Bấm vào trang chủ!", 0);
                 var items = driver.FindElement(By.XPath("//ytd-topbar-logo-renderer//yt-icon"));
-                action.MoveToElement(items).Click().Build().Perform();
+                new Actions(driver).MoveToElement(items).Click().Build().Perform();
                 Thread.Sleep(TimeSpan.FromSeconds(ran.Next(2, 5)));
                 // Kiểm tra xem trong trang chủ có Kênh của mình không
                 // Nếu có thì clikc() nếu không lặp lại 1 lần
-                bool stopRepeat = false;
-            repeat: // Lặp lại tìm kiếm khi load thêm đối tượng
+
+                AddStatus(this.index, "Đang tìm kiếm Video trên trang chủ!", 0);
                 var items1 = driver.FindElements(By.XPath("//ytd-rich-item-renderer//ytd-rich-grid-media"));
                 foreach (var item in items1)
                 {
-                    var íchannel = item.FindElement(By.Id("avatar-link"));
-                    var channel = íchannel.GetAttribute("href");
-                    // Console.WriteLine(channel);
+                    var ischannel = item.FindElement(By.Id("avatar-link"));
+                    var channel = ischannel.GetAttribute("href");
                     if (channel != null)
                     {
                         if (channel.Contains("https://www.youtube.com/@"))
@@ -200,30 +214,22 @@ namespace GPM_View
                             if (channelList.Contains(chnlID))
                             {
                                 var s = item.FindElement(By.TagName("ytd-thumbnail"));
-                                action.MoveToElement(s).Build().Perform();
+                                new Actions(driver).MoveToElement(s).Build().Perform();
                                 Thread.Sleep(TimeSpan.FromSeconds(1));
-                                action.ScrollByAmount(0, 100).Build().Perform();
+                                new Actions(driver).ScrollByAmount(0, 100).Build().Perform();
                                 Thread.Sleep(TimeSpan.FromSeconds(2));
-                                action.MoveToElement(s).Pause(TimeSpan.FromSeconds(2)).Click().Build().Perform();
+                                new Actions(driver).MoveToElement(s).Pause(TimeSpan.FromSeconds(2)).Click().Build().Perform();
                                 return true;
-                                break;
+                                
                             }
                             else
                             {
-                                action.ScrollByAmount(0, ran.Next(20, 200)).Build().Perform();
+                                new Actions(driver).ScrollByAmount(0, ran.Next(20, 100)).Build().Perform();
                             }
 
                         }
 
                     }
-                }
-                // Nếu =0 thì tìm kiếm tiếp
-                // bằng 1 thì load lại trang chủ và thực hiện tìm kiếm.
-                if (0 == 0 && stopRepeat == false)
-                {
-                    stopRepeat = true;
-                    stop = true;
-                    goto repeat;
                 }
 
                 if (!stop)
@@ -234,7 +240,7 @@ namespace GPM_View
             }
             catch
             {
-
+                AddStatus(this.index, "Tìm kiếm trang chủ lỗi!", 1);
             }
             return false;
         }
@@ -286,7 +292,7 @@ namespace GPM_View
             }
             catch
             {
-
+             
             }
 
             return result;

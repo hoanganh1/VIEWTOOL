@@ -34,3 +34,15 @@ C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\obj\Debug\GPM_View.csprojResolveAssembl
 C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\obj\Debug\GPM_View.Form1.resources
 C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\obj\Debug\GPM_View.Properties.Resources.resources
 C:\Users\Admin\Desktop\VIEWTOOL\GPM_View\obj\Debug\GPM_View.csproj.GenerateResource.Cache
+G:\Tool\VIEWTOOL\GPM_View\bin\Debug\GPM_View.exe.config
+G:\Tool\VIEWTOOL\GPM_View\obj\Debug\GPM_View.exe
+G:\Tool\VIEWTOOL\GPM_View\obj\Debug\GPM_View.pdb
+G:\Tool\VIEWTOOL\GPM_View\bin\Debug\GPM_View.exe
+G:\Tool\VIEWTOOL\GPM_View\bin\Debug\GPM_View.pdb
+G:\Tool\VIEWTOOL\GPM_View\bin\Debug\Newtonsoft.Json.dll
+G:\Tool\VIEWTOOL\GPM_View\bin\Debug\WebDriver.dll
+G:\Tool\VIEWTOOL\GPM_View\bin\Debug\Newtonsoft.Json.xml
+G:\Tool\VIEWTOOL\GPM_View\obj\Debug\GPM_View.csprojResolveAssemblyReference.cache
+G:\Tool\VIEWTOOL\GPM_View\obj\Debug\GPM_View.Form1.resources
+G:\Tool\VIEWTOOL\GPM_View\obj\Debug\GPM_View.Properties.Resources.resources
+G:\Tool\VIEWTOOL\GPM_View\obj\Debug\GPM_View.csproj.GenerateResource.Cache

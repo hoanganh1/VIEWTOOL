@@ -17,11 +17,15 @@ namespace GPM_View
 
         public Actions action { get; set; }
 
-        
-        public SuggestAutomation(UndetectChromeDriver driver)
+        public int index { get; set; }
+
+        public delegate void CallbackEventHandler(int index, string status, int type);
+        public event CallbackEventHandler AddStatus;
+        public SuggestAutomation(UndetectChromeDriver driver, int index)
         {
             this.driver = driver;
             this.action = new Actions(driver);
+            this.index = index;
         }
 
         /// <summary>
@@ -35,9 +39,33 @@ namespace GPM_View
         {
             try
             {
+                if(!driver.Url.Contains("watch?v"))
+                {
+                    SuggestFromAnother(keyword, Idvideo, 0);
+                    Thread.Sleep(3000);
+                    return;
+                }
+
+
                 int sc = ran.Next(0, 2);
+                int dk = ran.Next(0, 2);
+                bool result = false;
+                // Nếu không phải thì = 1
+                // nếu đúng channel thì =0 ;
                 int type = !isYourChannel(channelID) ? 1 : 0;
-                bool result = sc == 0 ? SuggestFromRight(channelNAme) : SuggestFromAnother(keyword, Idvideo, type);
+                if(type == 0) // Nếu là kênh của mình thì sẽ random 2 trường hợp
+                { // Đề xuất bên phải hoặc là đề xuất từ video người khác
+                    // đề xuất từ video người khác thì có 2 kiểu
+                    // Kiểu 0 là tìm kiếm rồi đề xuất
+                    // kiểu 1 là đề xuất trực tiếp bằng các add link vào
+                    result = sc == 0 ? SuggestFromRight(channelNAme) : SuggestFromAnother(keyword, Idvideo, 0);
+                }
+                else
+                {
+                    
+                    result = SuggestFromAnother(keyword, Idvideo, dk);
+                }
+             
                 Thread.Sleep(3000);
                 if (result == false) // Nếu một trong 2 cái thất bại thì lập tức gọi thằng thứ 2 luôn để add video vào trực tiếp luôn
                 {
@@ -58,48 +86,33 @@ namespace GPM_View
         /// </summary>
         public bool SuggestFromRight(string channelName)
         {
-
+            AddStatus(this.index, "Tìm video đề xuất bên phải", 0);
             try
             {
-                // Lấy tất cả những ID đang hiển thị 
-                // Và tím kiếm ID đang
+                // Lấy các topic đang hiển thị
+                // và lấy topic mà có kênh của kênh
                 var desCription = driver.FindElements(By.XPath("//iron-selector//yt-chip-cloud-chip-renderer//yt-formatted-string"));
-               
-                List<int> indexs = new List<int>();
-                for (int i = 0; i < desCription.Count; i++)
+
+                int muc = 0;
+                foreach (var i in desCription)
                 {
-                    if (desCription[i].Displayed)
+                    if (i.Text.Trim() != "")
                     {
-                        indexs.Add(i);
-                        Console.WriteLine(desCription[i].GetAttribute("title"));
+                        Console.WriteLine(i.Text);
+                        new Actions(driver).MoveToElement(i).Click().Build().Perform();
+                        Thread.Sleep(TimeSpan.FromSeconds(new Random().Next(5, 10)));
+                        if (FindAndClick(channelName, muc))
+                        { return true; }
+
                     }
-                    if (desCription[i].GetAttribute("title").Contains(channelName))
-                    {
-                        if (!indexs.Contains(i)) { indexs.Add(i); };
-                    }
+                    muc += 1;
 
                 }
-                Thread.Sleep(1000);
-
-                // Thực hiện ra xoát lần lượt từng Con đề xuất một
-                // Nếu nó có tồn tại thì thực hiện click luôn
-
-                foreach (int i in indexs)
-                {
-                    Actions act = new Actions(driver);
-                    // Lặp lần lượt, nếu mà tìm thấy thì dừng, nếu không tìm thấy thì lập tức chuyển sang xem của thằng khác luôn
-                    act.MoveToElement(desCription[indexs[i]]).ScrollByAmount(0, 20).MoveToElement(desCription[indexs[i]]).Click().Build().Perform();
-                    Thread.Sleep(3000);
-                    if (FindAndClick(channelName))
-                    {
-                        return true;
-                    }
-                }
-
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex);
+                AddStatus(this.index, "Tìm video bên phải thất bại", 1);
             }
 
             return false;
@@ -114,10 +127,13 @@ namespace GPM_View
         /// </summary>
         /// <param name="channelName"></param>
         /// <returns></returns>
-        public bool FindAndClick(string channelName)
+        public bool FindAndClick(string channelName, int idx)
         {
             try
             {
+                AddStatus(this.index, "Đang tìm kiếm mục " + idx, 0);
+
+                // Tìm một loạt để chọn ra danh sách video cần tìm
                 var desCription = driver.FindElements(By.XPath("//ytd-compact-video-renderer"));
                 List<int> indexForFinding = new List<int>();
                 for (int i = 0; i < desCription.Count; i++)
@@ -128,32 +144,36 @@ namespace GPM_View
                     {
                         indexForFinding.Add(i);
                     }
-                    Console.WriteLine(thubail.Text);
                 }
                 Thread.Sleep(1000);
+                
+                if(indexForFinding.Count ==0)
+                {
+                    AddStatus(this.index, "Không tìm thấy video mục " + idx, 0);
+                    return false;
+                }
 
                 // Thực hiện cuộn đến vị trí được chọn
                 int indexToRun = ran.Next(0, indexForFinding.Count);
                 for (int i = 0; i <= indexForFinding[indexToRun]; i++)
                 {
-                    Actions act = new Actions(driver);
                     if (i == indexForFinding[indexToRun])
                     {
                         // click ngẫu nhiên vào thumb hoặc là hình ảnh
                         var titleOrthubm = ran.Next(0, 2) == 0 ? desCription[i].FindElement(By.TagName("ytd-thumbnail")) : desCription[i].FindElement(By.Id("video-title"));
-                        act.MoveToElement(titleOrthubm).ScrollByAmount(0, 200).MoveToElement(titleOrthubm).Pause(TimeSpan.FromSeconds(2)).Click().Build().Perform();
+                        new Actions(driver).MoveToElement(titleOrthubm).ScrollByAmount(0, 200).MoveToElement(titleOrthubm).Pause(TimeSpan.FromSeconds(2)).Click().Build().Perform();
                         return true;
                     }
                     else
                     {
-                        act.ScrollByAmount(0, ran.Next(50, 300)).Build().Perform();
+                        new Actions(driver).ScrollByAmount(0, ran.Next(50, 300)).Build().Perform();
                     }
                 }
 
             }
             catch
             {
-
+                AddStatus(this.index, "Lỗi tìm video tìm kiếm mục " + idx, 0);
             }
             return false;
         }
@@ -170,47 +190,66 @@ namespace GPM_View
             {
                 if (type == 0)
                 {
-                    int rn = ran.Next(0, 2);
-                    // nếu rn =0 thì bấm vào home trước khi thực hiện search
-                    if (rn == 0)
+                    try
                     {
-                        var items = driver.FindElement(By.XPath("//ytd-topbar-logo-renderer//yt-icon"));
-                        Actions act = new Actions(driver);
-                        act.MoveToElement(items).Click().Build().Perform();
-                        Thread.Sleep(TimeSpan.FromSeconds(2));
-                    }
-                    var search = driver.FindElement(By.Name("search_query"));
-                    search.Clear();
-                    Actions acts = new Actions(driver);
-                    acts.MoveToElement(search).Click().Pause(TimeSpan.FromSeconds(ran.Next(1, 3))).Build().Perform();
+                        AddStatus(this.index, "Tìm kiếm + đề xuất đang chạy!", 0);
+                        int rn = ran.Next(0, 2);
 
-                    for (int i = 0; i < searchKeywork.Length; i++)
-                    {
-                        Thread.Sleep(ran.Next(100, 1000));
-                        acts.SendKeys(searchKeywork[i].ToString()).Build().Perform();
+                        if (rn == 0)// nếu rn =0 thì bấm vào home trước khi thực hiện search
+                        {
+                            var items = driver.FindElement(By.XPath("//ytd-topbar-logo-renderer//yt-icon"));
+                            new Actions(driver).MoveToElement(items).Click().Build().Perform();
+                            Thread.Sleep(TimeSpan.FromSeconds(3));
+                        }
+
+                        AddStatus(this.index, "Random ngẫu nhiên các từ khóa tìm kiếm!", 0);
+                        var search = driver.FindElement(By.Name("search_query"));
+                        search.Clear();
+                        Actions acts = new Actions(driver);
+                        acts.MoveToElement(search).Click().Pause(TimeSpan.FromSeconds(ran.Next(1, 3))).Build().Perform();
+
+                        for (int i = 0; i < searchKeywork.Length; i++)
+                        {
+                            Thread.Sleep(ran.Next(100, 1000));
+                            acts.SendKeys(searchKeywork[i].ToString()).Build().Perform();
+                        }
+                        Thread.Sleep(1000);
+                        acts.SendKeys(Keys.Enter).Pause(TimeSpan.FromSeconds(1)).Build().Perform();
+                        Thread.Sleep(3000);
+
+                        AddStatus(this.index, "Chọn ngẫu nhiên video để xem!", 0);
+                        var titles = driver.FindElements(By.XPath("//ytd-video-renderer//h3//a"));
+                        int choose = ran.Next(0, titles.Count);
+                        for (int i = 0; i < titles.Count; i++)
+                        {
+                            if (choose == i)
+                            {
+                                new Actions(driver).MoveToElement(titles[i]).Pause(TimeSpan.FromSeconds(1)).ScrollByAmount(0, 200).MoveToElement(titles[i]).Pause(TimeSpan.FromSeconds(2)).Click().Build().Perform();
+                                break;
+                            }
+                            else
+                            {
+                                new Actions(driver).ScrollByAmount(0, ran.Next(50, 300)).Build().Perform();
+                            }
+                        }
+
+                        int timeWait = ran.Next(30, 80);
+                        AddStatus(this.index, "Xem ngẫu nhiên " + timeWait + " giây!", 0);
+                        Thread.Sleep(TimeSpan.FromSeconds(timeWait));
                     }
-                    Thread.Sleep(1000);
-                    acts.SendKeys(Keys.Enter).Pause(TimeSpan.FromSeconds(1)).Build().Perform();
-                    Thread.Sleep(3000);
-                    var titles = driver.FindElements(By.XPath("//ytd-video-renderer//h3//a"));
+                    catch
+                    {
+                        AddStatus(this.index, "Tìm kiếm + đề xuất Lỗi!", 1);
+                    }
                     
-                    int choose = ran.Next(0, titles.Count);
-                    for (int i = 0; i < titles.Count; i++)
-                    {
-                        Actions actr = new Actions(driver);
-                        if (choose == i)
-                        {
-                            actr.MoveToElement(titles[i]).Pause(TimeSpan.FromSeconds(1)).ScrollByAmount(0, 200).MoveToElement(titles[i]).Pause(TimeSpan.FromSeconds(2)).Click().Build().Perform();
-                            break;
-                        }
-                        else
-                        {
-                            actr.ScrollByAmount(0, ran.Next(50, 300)).Build().Perform();
-                        }
-                    }
-                    // Đợi để xem video của họ
-                    Thread.Sleep(TimeSpan.FromSeconds(ran.Next(30, 80)));
 
+                }
+                List<string> urlIfFalse = new List<string>() { "https://www.youtube.com/watch?v=GJLHlBRqKAI", "https://www.youtube.com/watch?v=r6zIGXun57U", "https://www.youtube.com/watch?v=hheZSOCEpwA" };
+
+                if(!driver.Url.Contains("watch?v"))
+                {
+                    driver.Get(urlIfFalse[ran.Next(0, urlIfFalse.Count)]);
+                    Thread.Sleep(3000);
                 }
 
                 // Thực hiện chèn video của mình vào trong mô tả của họ
@@ -234,12 +273,11 @@ namespace GPM_View
                 Thread.Sleep(5000);
                 // Thực hiện tìm kiếm và bấm vào video đề xuất để thực hiện
                 var desCription = driver.FindElements(By.XPath("//ytd-text-inline-expander//a"));
-                Actions de = new Actions(driver);
                 foreach (var i in desCription)
                 {
                     if (i.GetAttribute("href").Contains(videoID))
                     {
-                        de.MoveToElement(i).Pause(TimeSpan.FromSeconds(1)).ScrollByAmount(0, 100).MoveToElement(i).Pause(TimeSpan.FromSeconds(2)).Click().Build().Perform();
+                        new Actions(driver).MoveToElement(i).Pause(TimeSpan.FromSeconds(1)).ScrollByAmount(0, 100).MoveToElement(i).Pause(TimeSpan.FromSeconds(2)).Click().Build().Perform();
                         return true;
                     }
 
@@ -273,7 +311,7 @@ namespace GPM_View
             }
             catch
             {
-
+                AddStatus(this.index, "Lỗi kiểm tra channel!", 2);
             }
 
             return result;
